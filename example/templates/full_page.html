@@ -18,8 +18,10 @@
 			{{ if .Page.Category.Parent }}
 				<li><a href="{{ .Siteinfo.AbsolutePrefix }}{{ .Page.Category.Parent.Path }}index.html">&lt; {{ .Page.Category.Parent.Name }}</a></li>
 			{{ end }}
-				<li><a href="{{ .Siteinfo.AbsolutePrefix }}{{ .Page.Category.Path }}index.html">&and; {{ .Page.Category.Name }}</a></li>
+				<li><a {{ if eq .Page.Basename "index" }}class="active"{{ end }} href="{{ .Siteinfo.AbsolutePrefix }}{{ .Page.Category.Path }}index.html">&and; {{ .Page.Category.Name }}</a></li>
+			{{ if ne .Page.Basename "index" }}
 				<li><a class="active" href="{{ .Siteinfo.AbsolutePrefix }}{{ .Page.Path }}">{{ .Page.Title }}</a></li>
+			{{ end }}
 			{{ range .Page.Category.SubCategories }}
 				<li><a href="{{ $siteinfo.AbsolutePrefix }}{{ .Path }}index.html">{{ .Name }} &gt;</a></li>
 			{{ end }}

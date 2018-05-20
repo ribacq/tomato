@@ -1,6 +1,6 @@
-package tomato
+package main
 
-/* tomato is a static website generator. */
+/* main: tomato is a static website generator. */
 
 import (
 	"encoding/json"
