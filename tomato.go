@@ -30,13 +30,12 @@ type Author struct {
 // PathPrefix is a prefix to append to all relative URLs.
 // Authors must contain all possible authors for the website.
 type Siteinfo struct {
-	Name           string   `json: "name"`
-	Title          string   `json: "title"`
-	Subtitle       string   `json: "subtitle"`
-	Description    string   `json: "description"`
-	Copyright      string   `json: "copyright"`
-	AbsolutePrefix string   `json: "absoluteprefix"`
-	Authors        []Author `json: "authors"`
+	Name        string   `json: "name"`
+	Title       string   `json: "title"`
+	Subtitle    string   `json: "subtitle"`
+	Description string   `json: "description"`
+	Copyright   string   `json: "copyright"`
+	Authors     []Author `json: "authors"`
 }
 
 // Category represent a category, that is, a directory in the tree.
@@ -67,8 +66,8 @@ type Page struct {
 }
 
 // Html wraps the blackfriday markdown converter. It takes and returns a slice of bytes.
-func Html(content []byte, siteinfo Siteinfo) []byte {
-	return blackfriday.Run(content, blackfriday.WithRenderer(blackfriday.NewHTMLRenderer(blackfriday.HTMLRendererParameters{AbsolutePrefix: siteinfo.AbsolutePrefix})), blackfriday.WithExtensions(blackfriday.Tables|blackfriday.FencedCode|blackfriday.Footnotes|blackfriday.Autolink))
+func Html(content []byte, page Page) []byte {
+	return blackfriday.Run(content, blackfriday.WithRenderer(blackfriday.NewHTMLRenderer(blackfriday.HTMLRendererParameters{AbsolutePrefix: page.PathToRoot()})), blackfriday.WithExtensions(blackfriday.Tables|blackfriday.FencedCode|blackfriday.Footnotes|blackfriday.Autolink))
 }
 
 // Helper prints a html link to an author.
@@ -82,24 +81,34 @@ func (siteinfo Siteinfo) MainAuthorHelper() string {
 }
 
 // CopyrightHelper prints html for the copyright information.
-func (siteinfo Siteinfo) CopyrightHelper() string {
-	return string(Html([]byte(siteinfo.Copyright), siteinfo))
+func (siteinfo Siteinfo) CopyrightHelper(page Page) string {
+	return string(Html([]byte(siteinfo.Copyright), page))
+}
+
+// SubtitleHelper prints html for the site subtitle.
+func (siteinfo Siteinfo) SubtitleHelper(page Page) string {
+	return string(Html([]byte(siteinfo.Subtitle), page))
+}
+
+// DescriptionHelper prints html for the site description.
+func (siteinfo Siteinfo) DescriptionHelper(page Page) string {
+	return string(Html([]byte(siteinfo.Description), page))
 }
 
 // ContentHelper prints the page in html.
-func (page Page) ContentHelper(siteinfo Siteinfo) string {
-	return string(Html(page.Content, siteinfo))
+func (page Page) ContentHelper() string {
+	return string(Html(page.Content, page))
 }
 
 // PathHelper prints the path from the root to the current page in html.
 func (page Page) PathHelper(siteinfo Siteinfo) string {
 	var str string
 	if page.Basename != "index" {
-		str = fmt.Sprintf("<a href=\"%s%s\">%s</a>", siteinfo.AbsolutePrefix, page.Path(), page.Title)
+		str = fmt.Sprintf("<a href=\"%s%s\">%s</a>", page.PathToRoot(), page.Path(), page.Title)
 	}
 	cat := page.Category
 	for cat != nil {
-		prefix := fmt.Sprintf("<a href=\"%s%sindex.html\">%s</a>", siteinfo.AbsolutePrefix, cat.Path(), cat.Name)
+		prefix := fmt.Sprintf("<a href=\"%s%sindex.html\">%s</a>", page.PathToRoot(), cat.Path(), cat.Name)
 		if len(str) == 0 {
 			str = prefix
 		} else {
@@ -169,6 +178,15 @@ func (page *Page) Path() string {
 	return page.Category.Path() + page.Basename + ".html"
 }
 
+// PathToRoot returns a series of '../' in a string to give a relative path from this page to the root of the website.
+func (page *Page) PathToRoot() string {
+	str := "."
+	for i := 0; i < len(strings.Split(page.Path(), "/"))-2; i++ {
+		str += "/.."
+	}
+	return str
+}
+
 // MDTree returns the tree of all pages in markdown format
 func (cat *Category) MDTree(prefix string, showPages bool) []byte {
 	str := fmt.Sprintf("%s* [%s](%sindex.html)\n", prefix, cat.Name, cat.Path())
@@ -186,8 +204,8 @@ func (cat *Category) MDTree(prefix string, showPages bool) []byte {
 }
 
 // NavHelper returns the tree returned by MDTree, converted to Html format.
-func (cat Category) NavHelper(siteinfo Siteinfo, showPages bool) string {
-	return string(Html(cat.MDTree("", showPages), siteinfo))
+func (cat Category) NavHelper(page Page, showPages bool) string {
+	return string(Html(cat.MDTree("", showPages), page))
 }
 
 // Tags returns all the tags present in pages in the category and all subcategories.
@@ -416,7 +434,6 @@ func main() {
 			fmt.Println("Error: incorrect /siteinfo.json")
 			return
 		}
-		siteinfo.AbsolutePrefix = strings.TrimRight(siteinfo.AbsolutePrefix, "/")
 	} else {
 		fmt.Println("Error: no /siteinfo.json found")
 		return
@@ -561,7 +578,7 @@ func main() {
 				fmt.Println(err)
 				return
 			}
-			contentTemplate := template.Must(template.New("Content").Parse(string(Html(page.Content, siteinfo))))
+			contentTemplate := template.Must(template.New("Content").Parse(string(Html(page.Content, *page))))
 			err = contentTemplate.ExecuteTemplate(pageFile, "Content", arg)
 			if err != nil {
 				fmt.Println(err)
@@ -613,10 +630,13 @@ func main() {
 			return
 		}
 		err = pageListTemplate.ExecuteTemplate(catFile, "PageList", map[string]interface{}{
-			"Siteinfo": siteinfo,
-			"Pages":    catQueue[0].Pages,
-			"Title":    "Category: " + catQueue[0].Name,
-			"Tags":     catQueue[0].Tags(),
+			"Pages": catQueue[0].Pages,
+			"Page": &Page{
+				Category: catQueue[0],
+				Basename: "index",
+			},
+			"Title": "Category: " + catQueue[0].Name,
+			"Tags":  catQueue[0].Tags(),
 		})
 		if err != nil {
 			fmt.Println(err)
@@ -660,10 +680,13 @@ func main() {
 			return
 		}
 		err = pageListTemplate.ExecuteTemplate(tagFile, "PageList", map[string]interface{}{
-			"Siteinfo": siteinfo,
-			"Pages":    tree.FilterByTags([]string{tag}),
-			"Title":    "Tag: " + tag,
-			"Tags":     []string{tag},
+			"Pages": tree.FilterByTags([]string{tag}),
+			"Title": "Tag: " + tag,
+			"Page": &Page{
+				Category: tree,
+				Basename: "tag/" + tag,
+			},
+			"Tags": []string{tag},
 		})
 		if err != nil {
 			fmt.Println(err)

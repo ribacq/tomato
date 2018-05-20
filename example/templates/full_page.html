@@ -1,29 +1,29 @@
 {{ define "Header" }}
-{{ $siteinfo := .Siteinfo }}
+{{ $page := .Page }}
 <!doctype html>
 <html>
 	<head>
 		<meta charset="utf-8">
 		<title>{{ .Page.Title }} — {{ .Siteinfo.Title }}</title>
-		<link rel="stylesheet" type="text/css" href="{{ .Siteinfo.AbsolutePrefix }}/assets/style.css">
+		<link rel="stylesheet" type="text/css" href="{{ .Page.PathToRoot }}/assets/style.css">
 	</head>
 	<body>
 		<header>
-			<h1><a href="{{ .Siteinfo.AbsolutePrefix }}/index.html">{{ .Siteinfo.Title }}</a></h1>
-			<div id="subtitle">{{ .Siteinfo.Subtitle }}</div>
+			<h1><a href="{{ .Page.PathToRoot }}/index.html">{{ .Siteinfo.Title }}</a></h1>
+			<div id="subtitle">{{ .Siteinfo.SubtitleHelper .Page }}</div>
 		</header>
 		<nav>
 			<div class="float-left">{{ .Page.PathHelper .Siteinfo }}</div>
 			<ul>
 			{{ if .Page.Category.Parent }}
-				<li><a href="{{ .Siteinfo.AbsolutePrefix }}{{ .Page.Category.Parent.Path }}index.html">&lt; {{ .Page.Category.Parent.Name }}</a></li>
+				<li><a href="{{ .Page.PathToRoot }}{{ .Page.Category.Parent.Path }}index.html">&lt; {{ .Page.Category.Parent.Name }}</a></li>
 			{{ end }}
-				<li><a {{ if eq .Page.Basename "index" }}class="active"{{ end }} href="{{ .Siteinfo.AbsolutePrefix }}{{ .Page.Category.Path }}index.html">&and; {{ .Page.Category.Name }}</a></li>
+				<li><a {{ if eq .Page.Basename "index" }}class="active"{{ end }} href="{{ .Page.PathToRoot }}{{ .Page.Category.Path }}index.html">&and; {{ .Page.Category.Name }}</a></li>
 			{{ if ne .Page.Basename "index" }}
-				<li><a class="active" href="{{ .Siteinfo.AbsolutePrefix }}{{ .Page.Path }}">{{ .Page.Title }}</a></li>
+				<li><a class="active" href="{{ .Page.PathToRoot }}{{ .Page.Path }}">{{ .Page.Title }}</a></li>
 			{{ end }}
 			{{ range .Page.Category.SubCategories }}
-				<li><a href="{{ $siteinfo.AbsolutePrefix }}{{ .Path }}index.html">{{ .Name }} &gt;</a></li>
+				<li><a href="{{ $page.PathToRoot }}{{ .Path }}index.html">{{ .Name }} &gt;</a></li>
 			{{ end }}
 			</ul>
 		</nav>
@@ -34,7 +34,7 @@
 				<time>{{ .Page.Date }}</time>
 				<ul class="tags">
 				{{ range .Page.Tags }}
-					<li><a href="{{ $siteinfo.AbsolutePrefix }}/tag/{{ . }}.html">{{ . }}</a></li>
+					<li><a href="{{ $page.PathToRoot }}/tag/{{ . }}.html">{{ . }}</a></li>
 				{{ end }}
 				</ul>
 
@@ -42,13 +42,13 @@
 				<h2>{{ .Page.Category.Name }}</h2>
 				{{ if .Page.Category.Parent }}
 					<h3>Parent category</h3>
-					<p><a href="{{ .Siteinfo.AbsolutePrefix }}{{ .Page.Category.Parent.Path }}index.html">{{ .Page.Category.Parent.Name }}</a></p>
+					<p><a href="{{ .Page.PathToRoot }}{{ .Page.Category.Parent.Path }}index.html">{{ .Page.Category.Parent.Name }}</a></p>
 				{{ end }}
 				{{ if len .Page.Category.SubCategories }}
 					<h3>Sub-categories</h3>
 					<ul>
 					{{ range .Page.Category.SubCategories }}
-						<li><a href="{{ $siteinfo.AbsolutePrefix }}{{ .Path }}index.html">{{ .Name }}</a></li>
+						<li><a href="{{ $page.PathToRoot }}{{ .Path }}index.html">{{ .Name }}</a></li>
 					{{ end }}
 					</ul>
 				{{ end }}
@@ -57,7 +57,7 @@
 					<h3>Pages</h3>
 					<ul>
 					{{ range .Page.Category.Pages }}
-						<li><a href="{{ $siteinfo.AbsolutePrefix }}{{ .Path }}">{{ .Title }}</a></li>
+						<li><a href="{{ $page.PathToRoot }}{{ .Path }}">{{ .Title }}</a></li>
 					{{ end }}
 					</ul>
 				{{ end }}
@@ -66,7 +66,7 @@
 				<h2>All tags</h2>
 				<ul class="tags">
 				{{ range .Tree.Tags }}
-					<li><a href="{{ $siteinfo.AbsolutePrefix }}/tag/{{ . }}.html">{{ . }}</a></li>
+					<li><a href="{{ $page.PathToRoot }}/tag/{{ . }}.html">{{ . }}</a></li>
 				{{ end }}
 				</ul>
 
@@ -74,13 +74,13 @@
 				<h2>Recent pages</h2>
 				<ul>
 				{{ range .Tree.RecentPages 5 }}	
-					<li><a href="{{ $siteinfo.AbsolutePrefix }}{{ .Path }}">{{ .Title }}</a> ({{ .Date }})</li>
+					<li><a href="{{ $page.PathToRoot }}{{ .Path }}">{{ .Title }}</a> ({{ .Date }})</li>
 				{{ end }}
 				</ul>
 				
 				<hr>
 				<h2>About</h2>
-				{{ .Siteinfo.Description }}
+				{{ .Siteinfo.DescriptionHelper .Page }}
 			</aside>
 			<section>
 {{ end }}
@@ -89,13 +89,13 @@
 		</main>
 		<footer>
 			{{ .Siteinfo.MainAuthorHelper }}
-			{{ .Siteinfo.CopyrightHelper }}
+			{{ .Siteinfo.CopyrightHelper .Page }}
 			<p>
 				<a href="https://github.com/ribacq/tomato">Statically generated with Tomato</a>
 			</p>
 		</footer>
 		<!-- load JS -->
-		<script type="text/javascript" src="{{ .Siteinfo.AbsolutePrefix }}/assets/main.js"><p>Sorry, you do not have Javascript enabled.</p></script>
+		<script type="text/javascript" src="{{ .Page.PathToRoot }}/assets/main.js"><p>Sorry, you do not have Javascript enabled.</p></script>
 	</body>
 </html>
 {{ end }}
