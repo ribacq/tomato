@@ -43,7 +43,6 @@ header div#subtitle {
 
 footer {
 	border-top: 10px solid var(--divider);
-	z-index: 10;
 }
 
 main {
@@ -53,7 +52,6 @@ main {
 
 aside {
 	position: relative;
-	z-index: 0;
 	flex: 1 1 20%;
 	background: var(--light-primary);
 	box-shadow: 0 0 20px var(--divider);
@@ -62,7 +60,6 @@ aside {
 section {
 	position: relative;
 	padding: 30px;
-	z-index: 20;
 	flex: 2 1 70%;
 }
 
@@ -110,7 +107,6 @@ nav {
 	border-bottom: 10px solid var(--divider);
 	padding: 0;
 	text-align: right;
-	z-index: 10;
 }
 
 nav ul {
@@ -143,25 +139,13 @@ nav ul li a:hover, nav ul li a.active {
 nav div.flowing-menu {
 	float: left;
 	position: relative;
-}
-
-nav div.flowing-menu {
-	display: block;
-	color: var(--accent);
-	background: var(--dark-primary);
-}
-
-nav div.flowing-menu:hover {
-	color: var(--text-icons);
-	background: var(--accent);
+	z-index: 100;
 }
 
 nav div.flowing-menu * {
 	background: var(--dark-primary);
-	display: block;
-	min-width: 100px;
-	position: relative;
 	text-align: left;
+	min-width: 100px;
 }
 
 nav div.flowing-menu li ul {
@@ -172,12 +156,13 @@ nav div.flowing-menu li ul {
 }
 
 nav div.flowing-menu li {
+	position: relative;
 	border-right: 10px solid var(--accent);
 	box-shadow: 0 0 1px var(--primary);
 }
 
-nav div.flowing-menu li:hover {
-	border-color: var(--dark-primary);
+nav div.flowing-menu li a {
+	padding-left: 20px;
 }
 
 nav div.flowing-menu li:hover > ul {
