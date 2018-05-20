@@ -1,5 +1,7 @@
 package main
 
+/* main is the entry point to tomato. */
+
 import (
 	"encoding/json"
 	"fmt"
