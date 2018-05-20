@@ -3,7 +3,6 @@
 This is a simple static blog generator written in Go.
 
 ## TODO
-* most recent pages in menu
 * translation of template text
 
 ## Process
@@ -74,7 +73,7 @@ site/
 	  page2.html
   tag/
     tag1.html
-	tag2.html
+    tag2.html
   media/
 	img/
 	  img1.png
