@@ -1,8 +1,8 @@
 {
-	"name": "blog",
-	"title": "hello world",
-	"subtitle": "my statically generated blog",
-	"description": "This is a *blog*.",
+	"name": "Home",
+	"title": "Tomato demo website",
+	"subtitle": "Who doesn’t enjoy a tomato with lettuce?",
+	"description": "This website is a demonstration of the capacities of *tomato*.",
 	"copyright": "Under [CC0](https://creativecommons.org/) license.",
 	"authors": [
 		{

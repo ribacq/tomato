@@ -170,6 +170,7 @@ ul.tags li a:hover {
 table {
 	border-collapse: collapse;
 	border: 1px solid var(--primary);
+	margin: 10px;
 }
 
 thead, th {
@@ -246,7 +247,17 @@ pre {
 	border-radius: 10px;
 }
 
+code {
+	font-family: monospace;
+	background: var(--light-primary);
+}
+
 .float-left {
 	float: left;
 	padding: 5px;
+}
+
+blockquote {
+	border-left: 10px solid var(--divider);
+	padding-left: 10px;
 }
