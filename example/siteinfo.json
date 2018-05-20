@@ -1,0 +1,18 @@
+{
+	"name": "blog",
+	"title": "hello world",
+	"subtitle": "my statically generated blog",
+	"description": "this is a blog",
+	"copyright": "cc0",
+	"absoluteprefix": "file:///home/jirsad/Documents/go/src/github.com/ribacq/tomato/example_html/",
+	"authors": [
+		{
+			"name": "Quentin Ribac",
+			"email": "quentin.ribac@gmail.com"
+		},
+		{
+			"name": "Jirsad",
+			"email": "jirsad-ioh@mailoo.org"
+		}
+	]
+}

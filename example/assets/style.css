@@ -1,0 +1,248 @@
+/* colors */
+body{
+	--primary: #607d8b;
+	--dark-primary: #455a64;
+	--light-primary: #cfd8dc;
+	--text-icons: #ffffff;
+	--accent: #ffc107;
+	--primary-text: #212121;
+	--secondary-text: #757575;
+	--divider: #bdbdbd;
+}
+
+body {
+	line-height: 1.2;
+	font-size: 18px;
+	color: var(--primary-text);
+	padding: 0;
+	margin: 0;
+}
+
+aside, section, footer {
+	margin: 0;
+	padding: 10px;
+}
+
+header, footer {
+	position: relative;
+	z-index: 10;
+	background: var(--primary);
+	box-shadow: 0 0 20px var(--dark-primary) inset;
+	color: var(--text-icons);
+}
+
+header {
+	margin: 0;
+	padding: 1px 0;
+	text-align: right;
+}
+
+header div#subtitle {
+	padding: 0;
+	margin: 10px;
+}
+
+footer {
+	border-top: 10px solid var(--divider);
+}
+
+main {
+	display: flex;
+	flex-flow: row wrap;
+}
+
+aside {
+	position: relative;
+	z-index: 0;
+	flex: 1 1 20%;
+	background: var(--light-primary);
+	box-shadow: 0 0 20px var(--primary);
+}
+
+section {
+	position: relative;
+	padding: 30px;
+	z-index: 20;
+	flex: 2 1 70%;
+}
+
+/* titles */
+h1, h2, h3 {
+	line-height: 1.2;
+	color: var(--primary);
+}
+
+header h1 {
+	margin-right: 10px;
+}
+
+header h1 a {
+	display: block;
+	color: var(--text-icons);
+}
+
+aside h2, aside h3 {
+	font-size: 1em;
+}
+
+/* links */
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	color: var(--accent);
+}
+
+main a {
+	color: var(--primary);
+}
+
+
+header a, nav a, footer a {
+	color: var(--accent);
+}
+
+/* nav list */
+nav {
+	background: var(--dark-primary);
+	border-bottom: 10px solid var(--divider);
+	padding: 0;
+	text-align: right;
+}
+
+nav ul {
+	padding: 5px 0;
+	margin: 0;
+	list-style: none;
+	padding: 0;
+}
+
+nav ul li {
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+	min-width: 100px;
+}
+
+nav ul li a {
+	display: block;
+	padding: 5px;
+	text-align: center;
+}
+
+nav ul li a:hover, nav ul li a.active {
+	color: var(--text-icons);
+	background: var(--accent);
+}
+
+/* tags */
+ul.tags {
+	padding: 0;
+}
+
+ul.tags li {
+	display: inline-block;
+	list-style: none;
+}
+
+ul.tags li a {
+	display: block;
+	border: 1px solid var(--primary);
+	border-left: 10px solid var(--dark-primary);
+	border-radius: 5px;
+	padding: 3px;
+	margin-right: 5px;
+	margin-bottom: 5px;
+	background: var(--primary);
+	color: var(--text-icons);
+}
+
+ul.tags li a:hover {
+	border-color: var(--accent);
+	color: var(--accent);
+}
+
+/* tables */
+table {
+	border-collapse: collapse;
+	border: 1px solid var(--primary);
+}
+
+thead, th {
+	color: var(--text-icons);
+	background: var(--primary);
+}
+
+tbody {
+	background: var(--light-primary);
+}
+
+th, td {
+	padding: 3px;
+}
+
+/* cards */
+div.cards {
+	display: flex;
+	flex-flow: row wrap;
+}
+
+div.card {
+	flex: 1 0 100px;
+	background: var(--light-primary);
+	margin: 20px;
+	border: 1px solid var(--primary);
+	border-radius: 10px;
+}
+
+div.card .card-title {
+	background: var(--primary);
+	margin: 0;
+	padding: 0;
+	border-radius: 10px 10px 0 0;
+}
+
+div.card .card-title a {
+	padding: 5px;
+	display: block;
+	color: var(--text-icons);
+}
+
+div.card .card-title a:hover {
+	color: var(--accent);
+}
+
+div.card .card-content {
+	padding: 10px;
+}
+
+/* misc elements */
+hr {
+	background: var(--divider);
+	height: 10px;
+	border: none;
+	margin: 0;
+	padding: 0;
+}
+
+img {
+	max-width: 50%;
+}
+
+ul {
+	padding-left: 25px;
+}
+
+pre {
+	background: var(--light-primary);
+	margin: 0 20px;
+	padding: 10px;
+	border: 1px solid var(--primary);
+	border-radius: 10px;
+}
+
+.float-left {
+	float: left;
+	padding: 5px;
+}

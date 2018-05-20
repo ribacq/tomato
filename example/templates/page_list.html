@@ -1,0 +1,25 @@
+{{ define "PageList" }}
+<div class="page-list">
+	<h1>{{ .Title }}</h1>
+	<p>{{ len .Pages }} page{{ if ge (len .Pages) 2 }}s{{ end }}</p>
+
+	{{ $siteinfo := .Siteinfo }}
+	<ul class="tags">
+	{{ range .Tags }}
+		<li><a href="{{ $siteinfo.AbsolutePrefix }}/tag/{{ . }}.html">{{ . }}</a></li>
+	{{ end }}
+	</ul>
+
+	<div class="cards">
+	{{ range .Pages }}
+		<div class="card">
+			<h2 class="card-title"><a href="{{ $siteinfo.AbsolutePrefix }}{{ .Path }}">{{ .Title }}</a></h2>
+			<div class="card-content">
+				{{ .Author.Helper }}
+				{{ .Date }}
+			</div>
+		</div>
+	{{ end }}
+	</div>
+</div>
+{{ end }}
