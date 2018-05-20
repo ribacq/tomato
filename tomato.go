@@ -1,9 +1,11 @@
-package main
+// Tomato static website generator
+// Copyright Quentin Ribac, 2018
+// Free software license can be found in the LICENSE file.
 
 /*
-Package main
 Tomato is a static website generator.
 */
+package main
 
 import (
 	"encoding/json"
@@ -27,9 +29,9 @@ type Author struct {
 }
 
 // Siteinfo contains the site-wide meta. There should be only one of them.
-// name and title will be printed in the header,
-// description will be printed in the menu,
-// copyright will be printed in the footer.
+// Name and Title will be printed in the header,
+// Description will be printed in the menu,
+// Copyright will be printed in the footer.
 // Authors must contain all possible authors for the website.
 type Siteinfo struct {
 	Name        string   `json: "name"`
@@ -41,7 +43,8 @@ type Siteinfo struct {
 }
 
 // Category represent a category, that is, a directory in the tree.
-// Name and description are fetched from a `catinfo.json` file that should
+// Name and Description are fetched from a `catinfo.json` file that should
+// Basename is the bit that goes in the URL.
 // be located at the root of every directory.
 type Category struct {
 	Parent        *Category   `json: "-"`
