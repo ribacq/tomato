@@ -25,7 +25,6 @@ aside, section, footer {
 
 header, footer {
 	position: relative;
-	z-index: 10;
 	background: var(--primary);
 	box-shadow: 0 0 20px var(--dark-primary) inset;
 	color: var(--text-icons);
@@ -44,6 +43,7 @@ header div#subtitle {
 
 footer {
 	border-top: 10px solid var(--divider);
+	z-index: 10;
 }
 
 main {
@@ -56,7 +56,7 @@ aside {
 	z-index: 0;
 	flex: 1 1 20%;
 	background: var(--light-primary);
-	box-shadow: 0 0 20px var(--primary);
+	box-shadow: 0 0 20px var(--divider);
 }
 
 section {
@@ -105,10 +105,12 @@ header a, nav a, footer a {
 
 /* nav list */
 nav {
+	position: relative;
 	background: var(--dark-primary);
 	border-bottom: 10px solid var(--divider);
 	padding: 0;
 	text-align: right;
+	z-index: 10;
 }
 
 nav ul {

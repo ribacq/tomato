@@ -72,7 +72,7 @@ func Html(content []byte, page Page) []byte {
 
 // Helper prints a html link to an author.
 func (author *Author) Helper() string {
-	return fmt.Sprintf("<address><a href=\"%s\">%s</a></address>", author.Email, author.Name)
+	return fmt.Sprintf("<address><a href=\"mailto:%s\">%s</a></address>", author.Email, author.Name)
 }
 
 // MainAuthorHelper prints a html link to the first author of the siteinfo.
