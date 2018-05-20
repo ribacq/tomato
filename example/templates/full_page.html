@@ -19,7 +19,7 @@
 				{{ if .Page.Category.Parent }}
 					<li><a href="{{ .Page.PathToRoot }}{{ .Page.Category.Parent.Path }}index.html">&lt; {{ .Page.Category.Parent.Name }}</a></li>
 				{{ end }}
-				<li><a {{ if eq .Page.Basename "index" }}class="active"{{ end }} href="{{ .Page.PathToRoot }}{{ .Page.Category.Path }}index.html">. {{ .Page.Category.Name }}</a></li>
+				<li><a class="active" href="{{ .Page.PathToRoot }}{{ .Page.Category.Path }}index.html">. {{ .Page.Category.Name }}</a></li>
 				{{ range .Page.Category.SubCategories }}
 					<li><a href="{{ $page.PathToRoot }}{{ .Path }}index.html">{{ .Name }} &gt;</a></li>
 				{{ end }}
