@@ -104,7 +104,7 @@ func (page Page) ContentHelper() string {
 func (page Page) PathHelper(curPage Page) string {
 	var str string
 	if page.Basename != "index" {
-		str = fmt.Sprintf("<a href=\"%s%s\">%s</a>", curPage.PathToRoot, page.Path(), page.Title)
+		str = fmt.Sprintf("<a href=\"%s%s\">%s</a>", curPage.PathToRoot(), page.Path(), page.Title)
 	}
 	cat := page.Category
 	for cat != nil {
