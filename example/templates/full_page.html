@@ -52,7 +52,7 @@
 				<h2>Recent pages</h2>
 				<ul>
 				{{ range .Tree.RecentPages 5 }}	
-					<li><a href="{{ $page.PathToRoot }}{{ .Path }}">{{ .Title }}</a> ({{ .Date }})</li>
+					<li><a href="{{ $page.PathToRoot }}{{ .Path }}#disqus_thread">{{ .Title }}</a> ({{ .Date }})</li>
 				{{ end }}
 				</ul>
 				
@@ -63,6 +63,24 @@
 			<section>
 {{ end }}
 {{ define "Footer" }}
+				<div id="disqus_thread"></div>
+				<script>
+				/*
+				RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+				LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+				*/
+				var disqus_config = function () {
+					this.page.url = "https://ribacq.github.io/tomato";  // Replace PAGE_URL with your page's canonical URL variable
+					this.page.identifier = "{{ .Page.Path }}"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+				};
+				(function() { // DON'T EDIT BELOW THIS LINE
+					var d = document, s = d.createElement('script');
+					s.src = 'https://tomatogen.disqus.com/embed.js';
+					s.setAttribute('data-timestamp', +new Date());
+					(d.head || d.body).appendChild(s);
+				})();
+				</script>
+				<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 			</section>
 		</main>
 		<footer>
@@ -77,6 +95,7 @@
 		</footer>
 		<!-- load JS -->
 		<script type="text/javascript" src="{{ .Page.PathToRoot }}/assets/main.js"><p>Sorry, you do not have Javascript enabled.</p></script>
+		<script id="dsq-count-scr" src="//tomatogen.disqus.com/count.js" async></script>
 	</body>
 </html>
 {{ end }}
