@@ -101,14 +101,14 @@ func (page Page) ContentHelper() string {
 }
 
 // PathHelper prints the path from the root to the current page in html.
-func (page Page) PathHelper(siteinfo Siteinfo) string {
+func (page Page) PathHelper(curPage Page) string {
 	var str string
 	if page.Basename != "index" {
-		str = fmt.Sprintf("<a href=\"%s%s\">%s</a>", page.PathToRoot(), page.Path(), page.Title)
+		str = fmt.Sprintf("<a href=\"%s%s\">%s</a>", curPage.PathToRoot, page.Path(), page.Title)
 	}
 	cat := page.Category
 	for cat != nil {
-		prefix := fmt.Sprintf("<a href=\"%s%sindex.html\">%s</a>", page.PathToRoot(), cat.Path(), cat.Name)
+		prefix := fmt.Sprintf("<a href=\"%s%sindex.html\">%s</a>", curPage.PathToRoot(), cat.Path(), cat.Name)
 		if len(str) == 0 {
 			str = prefix
 		} else {
@@ -189,7 +189,7 @@ func (page *Page) PathToRoot() string {
 
 // MDTree returns the tree of all pages in markdown format
 func (cat *Category) MDTree(prefix string, showPages bool) []byte {
-	str := fmt.Sprintf("%s* [%s](%sindex.html)\n", prefix, cat.Name, cat.Path())
+	str := fmt.Sprintf("%s* [%s >](%sindex.html)\n", prefix, cat.Name, cat.Path())
 	for _, subCat := range cat.SubCategories {
 		str += string(subCat.MDTree("\t"+prefix, showPages))
 	}

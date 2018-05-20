@@ -139,6 +139,51 @@ nav ul li a:hover, nav ul li a.active {
 	background: var(--accent);
 }
 
+/* flowing menu */
+nav div.flowing-menu {
+	float: left;
+	position: relative;
+}
+
+nav div.flowing-menu {
+	display: block;
+	color: var(--accent);
+	background: var(--dark-primary);
+}
+
+nav div.flowing-menu:hover {
+	color: var(--text-icons);
+	background: var(--accent);
+}
+
+nav div.flowing-menu * {
+	background: var(--dark-primary);
+	display: block;
+	min-width: 100px;
+	position: relative;
+	text-align: left;
+}
+
+nav div.flowing-menu li ul {
+	position: absolute;
+	top: 0;
+	left: 100%;
+	display: none;
+}
+
+nav div.flowing-menu li {
+	border-right: 10px solid var(--accent);
+	box-shadow: 0 0 1px var(--primary);
+}
+
+nav div.flowing-menu li:hover {
+	border-color: var(--dark-primary);
+}
+
+nav div.flowing-menu li:hover > ul {
+	display: block;
+}
+
 /* tags */
 ul.tags {
 	padding: 0;

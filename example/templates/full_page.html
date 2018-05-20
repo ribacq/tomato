@@ -9,29 +9,29 @@
 	</head>
 	<body>
 		<header>
-			<h1><a href="{{ .Page.PathToRoot }}/index.html">{{ .Siteinfo.Title }}</a></h1>
+			<h1><a href="{{ .Page.PathToRoot }}/index.html" id="top">{{ .Siteinfo.Title }}</a></h1>
 			<div id="subtitle">{{ .Siteinfo.SubtitleHelper .Page }}</div>
 		</header>
 		<nav>
-			<div class="float-left">{{ .Page.PathHelper .Siteinfo }}</div>
+			<div class="flowing-menu">{{ .Tree.NavHelper .Page true }}</div>
 			<ul>
-				<li>Pages</li>
-				{{ range .Page.Category.Pages }}
-					<li><a {{ if eq $page.Basename .Basename }}class="active"{{ end }} href="{{ $page.PathToRoot }}{{ .Path }}">{{ .Title }}</a></li>
+				<li><a {{ if eq .Page.Path "/index.html" }}class="active"{{ end }} href="{{ .Page.PathToRoot }}{{ .Tree.Path }}index.html">{{ .Tree.Name }}</a></li>
+				{{ range .Tree.Pages }}
+					{{ if ne .Basename "index" }}
+						<li><a {{ if eq $page.Path .Path }}class="active"{{ end }} href="{{ $page.PathToRoot }}{{ .Path }}">{{ .Title }}</a></li>
+					{{ end }}
 				{{ end }}
-				<li>Categories</li>
-				{{ if .Page.Category.Parent }}
-					<li><a href="{{ .Page.PathToRoot }}{{ .Page.Category.Parent.Path }}index.html">&lt; {{ .Page.Category.Parent.Name }}</a></li>
-				{{ end }}
-				<li><a class="active" href="{{ .Page.PathToRoot }}{{ .Page.Category.Path }}index.html">. {{ .Page.Category.Name }}</a></li>
-				{{ range .Page.Category.SubCategories }}
-					<li><a href="{{ $page.PathToRoot }}{{ .Path }}index.html">{{ .Name }} &gt;</a></li>
+				{{ range .Tree.SubCategories }}
+					<li><a {{ if eq $page.Category.Path .Path }}class="active"{{ end }} href="{{ $page.PathToRoot }}{{ .Path }}index.html">{{ .Name }}</a></li>
 				{{ end }}
 			</ul>
 		</nav>
 		<main>
 			<aside>
 				<h2>Page</h2>
+				<p>
+					{{ .Page.PathHelper .Page }}
+				</p>
 				{{ .Page.Author.Helper }}
 				<time>{{ .Page.Date }}</time>
 				<ul class="tags">
@@ -70,6 +70,9 @@
 			{{ .Siteinfo.CopyrightHelper .Page }}
 			<p>
 				<a href="https://github.com/ribacq/tomato">Statically generated with Tomato</a>
+			</p>
+			<p>
+				<a href="#top">Back to top</a>
 			</p>
 		</footer>
 		<!-- load JS -->
