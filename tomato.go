@@ -635,8 +635,9 @@ func main() {
 				Category: catQueue[0],
 				Basename: "index",
 			},
-			"Title": "Category: " + catQueue[0].Name,
-			"Tags":  catQueue[0].Tags(),
+			"Category": catQueue[0],
+			"Title":    "Category: " + catQueue[0].Name,
+			"Tags":     catQueue[0].Tags(),
 		})
 		if err != nil {
 			fmt.Println(err)

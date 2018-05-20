@@ -123,12 +123,13 @@ nav ul li {
 	margin: 0;
 	padding: 0;
 	min-width: 100px;
+	text-align: center;
+	color: var(--text-icons);
 }
 
 nav ul li a {
 	display: block;
 	padding: 5px;
-	text-align: center;
 }
 
 nav ul li a:hover, nav ul li a.active {
@@ -232,6 +233,7 @@ img {
 
 ul {
 	padding-left: 25px;
+	list-style: disc;
 }
 
 pre {
