@@ -1,6 +1,9 @@
 package main
 
-/* main: tomato is a static website generator. */
+/*
+Package main
+Tomato is a static website generator.
+*/
 
 import (
 	"encoding/json"
@@ -27,7 +30,6 @@ type Author struct {
 // name and title will be printed in the header,
 // description will be printed in the menu,
 // copyright will be printed in the footer.
-// PathPrefix is a prefix to append to all relative URLs.
 // Authors must contain all possible authors for the website.
 type Siteinfo struct {
 	Name        string   `json: "name"`
@@ -119,6 +121,27 @@ func (page Page) PathHelper(curPage Page) string {
 	return str
 }
 
+// mdTree returns the tree of all pages in markdown format
+func (cat *Category) mdTree(prefix string, showPages bool) []byte {
+	str := fmt.Sprintf("%s* [%s >](%sindex.html)\n", prefix, cat.Name, cat.Path())
+	for _, subCat := range cat.SubCategories {
+		str += string(subCat.mdTree("\t"+prefix, showPages))
+	}
+	if showPages {
+		for _, page := range cat.Pages {
+			if page.Basename != "index" {
+				str += fmt.Sprintf("%s\t* [%s](%s)\n", prefix, page.Title, page.Path())
+			}
+		}
+	}
+	return []byte(str)
+}
+
+// NavHelper returns the tree returned by mdTree, converted to Html format.
+func (cat Category) NavHelper(page Page, showPages bool) string {
+	return string(Html(cat.mdTree("", showPages), page))
+}
+
 // FilterByTags returns all pages, of a category and its subcategories recursively,
 // that match at least one of a given set of tags.
 func (cat *Category) FilterByTags(tags []string) (pages []*Page) {
@@ -187,27 +210,6 @@ func (page *Page) PathToRoot() string {
 	return str
 }
 
-// MDTree returns the tree of all pages in markdown format
-func (cat *Category) MDTree(prefix string, showPages bool) []byte {
-	str := fmt.Sprintf("%s* [%s >](%sindex.html)\n", prefix, cat.Name, cat.Path())
-	for _, subCat := range cat.SubCategories {
-		str += string(subCat.MDTree("\t"+prefix, showPages))
-	}
-	if showPages {
-		for _, page := range cat.Pages {
-			if page.Basename != "index" {
-				str += fmt.Sprintf("%s\t* [%s](%s)\n", prefix, page.Title, page.Path())
-			}
-		}
-	}
-	return []byte(str)
-}
-
-// NavHelper returns the tree returned by MDTree, converted to Html format.
-func (cat Category) NavHelper(page Page, showPages bool) string {
-	return string(Html(cat.MDTree("", showPages), page))
-}
-
 // Tags returns all the tags present in pages in the category and all subcategories.
 func (cat *Category) Tags() []string {
 	tagsMap := make(map[string]bool)
@@ -270,13 +272,11 @@ func (tree *Category) FindParent(fpath string) (*Category, error) {
 	for progress := true; progress && len(pathElems) > 0; {
 		progress = false
 		for _, subCat := range parent.SubCategories {
-			if len(pathElems) == 0 {
-				break
-			}
 			if subCat.Basename == pathElems[0] {
 				parent = subCat
 				pathElems = pathElems[1:]
 				progress = true
+				break
 			}
 		}
 	}
