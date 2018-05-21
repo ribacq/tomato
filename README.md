@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/ribacq/tomato.svg?branch=master)](https://travis-ci.org/ribacq/tomato)
 [![Coverage Status](https://coveralls.io/repos/github/ribacq/tomato/badge.svg?branch=master)](https://coveralls.io/github/ribacq/tomato?branch=master)
 [![GoDoc](https://godoc.org/github.com/ribacq/tomato?status.svg)](https://godoc.org/github.com/ribacq/tomato)
-x
+
 This is a simple static blog generator written in Go. Content will be written in Markdown. Json is used for the site and categories data.
 
 ## How-to
