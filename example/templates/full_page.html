@@ -52,7 +52,7 @@
 				<h2>Recent pages</h2>
 				<ul>
 				{{ range .Tree.RecentPages 5 }}	
-					<li><a href="https://ribacq.github.io/tomato{{ .Path }}#disqus_thread">{{ .Title }}</a> ({{ .Date }})</li>
+					<li><a href="{{ $page.PathToRoot }}{{ .Path }}">{{ .Title }}</a> ({{ .Date }}, <a href="{{ $page.PathToRoot }}{{ .Path }}#disqus_thread">{{ .Title }}</a>)</li>
 				{{ end }}
 				</ul>
 				
