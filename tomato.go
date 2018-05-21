@@ -230,6 +230,8 @@ func (cat *Category) Tags() []string {
 	for tag := range tagsMap {
 		tags = append(tags, tag)
 	}
+	sort.Strings(tags)
+
 	return tags
 }
 
