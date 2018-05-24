@@ -8,12 +8,15 @@
 ### Titles
 *emphasis*, **strong emphasis**, [links](https://reddit.com/), footnotes^[I am a *footnote*!]. Images:
 
-![a magnificient cat](/media/img/cat.jpg)
+!![a magnificient cat](/media/img/cat.jpg)
+
+Note that this image is featured in the header of the page, due to the double exclamation mark.
 
 Inline `code`.
 
 ```bash
-echo "code ${blocks}"
+!!![featured image](cat.jpg)
+![non featured image](dog.png)
 ```
 
 You can use inline <abbr title="HyperText Markup Language">HTML</abbr>.

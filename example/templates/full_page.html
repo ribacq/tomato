@@ -8,7 +8,7 @@
 		<link rel="stylesheet" type="text/css" href="{{ .Page.PathToRoot }}/assets/style.css">
 	</head>
 	<body>
-		<header>
+		<header {{ if .Page.PathToFeaturedImage }}style="background-image: url('{{ .Page.PathToRoot }}{{ .Page.PathToFeaturedImage }}')"{{ end }}>
 			<h1><a href="{{ .Page.PathToRoot }}/index.html" id="top">{{ .Siteinfo.Title }}</a></h1>
 			<div id="subtitle">{{ .Siteinfo.SubtitleHelper .Page }}</div>
 		</header>

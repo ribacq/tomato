@@ -30,7 +30,7 @@ header, footer {
 }
 
 header {
-	background: url('../media/img/cat.jpg') var(--primary);
+	background: var(--primary);
 	background-size: 100%;
 	background-position: center;
 	background-attachment: fixed;
@@ -295,4 +295,17 @@ code {
 blockquote {
 	border-left: 10px solid var(--divider);
 	padding-left: 10px;
+}
+
+.overlay-media {
+	display: block;
+	z-index: 100;
+	position: fixed;
+	max-height: 80vh;
+	max-width: 80vw;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	box-shadow: 0 0 50vw 25vw var(--dark-primary);
+	border: 10px solid var(--accent);
 }

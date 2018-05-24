@@ -147,6 +147,7 @@ func main() {
 			dateRE := regexp.MustCompile("#!date: (\\d{4}-\\d{2}-\\d{2})\\n")
 			tagsRE := regexp.MustCompile("#!tags: .+\\n")
 			draftRE := regexp.MustCompile("#!draft\\n")
+			featuredImageLinkRE := regexp.MustCompile("!!\\[(.+)\\]\\((.+)\\)")
 
 			title := strings.Trim(strings.TrimPrefix(string(titleRE.Find(content)), "#"), " \n")
 			author := strings.Trim(strings.TrimPrefix(string(authorRE.Find(content)), "#!author:"), " \n")
@@ -160,18 +161,24 @@ func main() {
 				}
 			}
 			draft := strings.Trim(strings.TrimPrefix(string(draftRE.Find(content)), "#!"), " \n") == "draft"
+			pathToFeaturedImage := ""
+			submatches := featuredImageLinkRE.FindSubmatch(content)
+			if len(submatches) >= 2 {
+				pathToFeaturedImage = string(submatches[2])
+			}
 
 			content = authorRE.ReplaceAll(content, []byte{})
 			content = dateRE.ReplaceAll(content, []byte{})
 			content = tagsRE.ReplaceAll(content, []byte{})
 			content = draftRE.ReplaceAll(content, []byte{})
+			content = featuredImageLinkRE.ReplaceAll(content, []byte("![$1]($2)"))
 
 			// add to tree as a Page struct
 			au, err := siteinfo.FindAuthor(author)
 			if err != nil {
 				return err
 			}
-			page := &Page{nil, strings.TrimSuffix(path.Base(fpath), ".md"), title, au, date, tags, draft, content, ""}
+			page := &Page{nil, strings.TrimSuffix(path.Base(fpath), ".md"), title, au, date, tags, draft, content, pathToFeaturedImage}
 
 			if page.Draft {
 				fmt.Printf("Skipping draft: ‘%s’\n", page.Title)
