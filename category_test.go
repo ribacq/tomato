@@ -146,6 +146,7 @@ func TestCategory_RecentPages(t *testing.T) {
 	p1 := Page{Date: "2018-04-02"}
 	p2 := Page{Date: "2017-04-02"}
 	p3 := Page{Date: "2016-04-02"}
+	p4 := Page{Date: "hello"}
 
 	testCases := []struct {
 		category *Category
@@ -155,11 +156,43 @@ func TestCategory_RecentPages(t *testing.T) {
 		{&Category{}, 0, nil},
 		{&Category{}, 5, nil},
 		{&Category{Pages: []*Page{&p3, &p2}, SubCategories: []*Category{{Pages: []*Page{&p1, &p0}}}}, 2, []*Page{&p0, &p1}},
+		{&Category{Pages: []*Page{&p0, &p4}}, 2, []*Page{&p0, &p4}},
+		{&Category{Pages: []*Page{&p4, &p0}}, 2, []*Page{&p0, &p4}},
 	}
 	for tci, tc := range testCases {
 		t.Run(fmt.Sprintf("%d", tci), func(t *testing.T) {
 			if got := tc.category.RecentPages(tc.n); reflect.DeepEqual(got, tc.want) == false {
 				t.Errorf("got %v; want %v", got, tc.want)
+			}
+		})
+	}
+}
+
+func TestCategory_FindParent(t *testing.T) {
+	cat3 := Category{Basename: "cat3"}
+	cat2 := Category{Basename: "cat2"}
+	cat1 := Category{Basename: "cat1", SubCategories: []*Category{&cat2}}
+	cat0 := Category{Basename: "cat0", SubCategories: []*Category{&cat1, &cat3}}
+
+	testCases := []struct {
+		fpath string
+		want  *Category
+		err   bool
+	}{
+		{".", nil, false},
+		{"/", &cat0, false},
+		{"/cat3/plop.html", &cat3, false},
+		{"/cat1/cat2/hello.html", &cat2, false},
+		{"/cat8/gnu.html", nil, true},
+	}
+	for tci, tc := range testCases {
+		t.Run(fmt.Sprintf("%d", tci), func(t *testing.T) {
+			got, err := cat0.FindParent(tc.fpath)
+			if (err != nil) != tc.err {
+				t.Errorf("got err = %v; want %v", err, tc.err)
+			}
+			if got != tc.want {
+				t.Errorf("got category = %v; want %v", got, tc.want)
 			}
 		})
 	}

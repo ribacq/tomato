@@ -156,7 +156,7 @@ func (cat *Category) RecentPages(n int) (pages []*Page) {
 		tj, err := time.Parse("2006-01-02", pages[j].Date)
 		if err != nil {
 			fmt.Println(err)
-			return false
+			return true
 		}
 		return ti.After(tj)
 	})
