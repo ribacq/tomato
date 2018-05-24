@@ -94,6 +94,11 @@ func (cat *Category) FilterByTags(tags []string) (pages []*Page) {
 	return
 }
 
+// FilterByTag wraps FilterByTags for just one tag.
+func (cat *Category) FilterByTag(tag string) []*Page {
+	return cat.FilterByTags([]string{tag})
+}
+
 // PageCount returns the total number of pages included in a category and its subcategories.
 func (cat *Category) PageCount() int {
 	count := len(cat.Pages)

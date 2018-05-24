@@ -43,8 +43,9 @@
 				<hr>
 				<h2>All tags</h2>
 				<ul class="tags">
+				{{ $tree := .Tree }}
 				{{ range .Tree.Tags }}
-					<li><a href="{{ $page.PathToRoot }}/tag/{{ . }}.html">{{ . }}</a></li>
+					<li><a href="{{ $page.PathToRoot }}/tag/{{ . }}.html">{{ . }} ({{ len ($tree.FilterByTag .) }})</a></li>
 				{{ end }}
 				</ul>
 
