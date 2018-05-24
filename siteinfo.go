@@ -5,12 +5,11 @@ import (
 )
 
 // Siteinfo contains the site-wide meta. There should be only one of them.
-// Name and Title will be printed in the header,
+// Title and Subtitle will be printed in the header,
 // Description will be printed in the menu,
 // Copyright will be printed in the footer.
 // Authors must contain all possible authors for the website.
 type Siteinfo struct {
-	Name        string   `json: "name"`
 	Title       string   `json: "title"`
 	Subtitle    string   `json: "subtitle"`
 	Description string   `json: "description"`
