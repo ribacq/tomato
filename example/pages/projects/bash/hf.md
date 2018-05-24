@@ -1,5 +1,5 @@
 #!author: Quentin Ribac
 #!date: 2018-03-17
-#!tags: projects, code, bash
+#!tags: project, code, bash
 
 # Horloge floue
