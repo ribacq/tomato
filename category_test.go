@@ -179,7 +179,7 @@ func TestCategory_FindParent(t *testing.T) {
 		want  *Category
 		err   bool
 	}{
-		{".", nil, false},
+		{":root:", nil, false},
 		{"/", &cat0, false},
 		{"/cat3/plop.html", &cat3, false},
 		{"/cat1/cat2/hello.html", &cat2, false},

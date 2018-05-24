@@ -21,7 +21,8 @@ import (
 // main is the entry point for the program.
 // This program should be called with one console-line argument: the path to the input directory.
 func main() {
-	// set input directory
+	// set input and output directories
+	fmt.Println("\x1b[1mSetting input and output directories...\x1b[0m")
 	var inputDir, outputDir string
 
 	// exit if no input directory was given
@@ -76,9 +77,9 @@ func main() {
 	tree := &Category{}
 
 	// load /siteinfo.json
+	fmt.Println("\n\x1b[1mLoading /siteinfo.json...\x1b[0m")
 	var siteinfo Siteinfo
 	if FileExists(inputDir + "/siteinfo.json") {
-		fmt.Println("Loading /siteinfo.json")
 		f, err := os.Open(inputDir + "/siteinfo.json")
 		if err != nil {
 			fmt.Println("Error: could not open /siteinfo.json")
@@ -94,11 +95,13 @@ func main() {
 		fmt.Println("Error: no /siteinfo.json found")
 		return
 	}
+	fmt.Printf("Done, %v authors found.\n", len(siteinfo.Authors))
 
 	// read category files (all catinfo.json)
-	fmt.Println("Loading categories... ")
+	fmt.Println("\n\x1b[1mLoading categories...\x1b[0m")
 	err = WalkDir(inputDir, func(fpath string) error {
 		if path.Base(fpath) == "catinfo.json" {
+			fmt.Println(fpath)
 			f, err := os.Open(fpath)
 			if err != nil {
 				return err
@@ -109,8 +112,12 @@ func main() {
 			if err != nil {
 				return err
 			}
-			cat.Basename = path.Base(path.Dir(fpath))
-			parent, err := tree.FindParent(path.Clean(strings.TrimPrefix(path.Dir(fpath), inputDir+"/pages")))
+			fpath = path.Dir(strings.TrimPrefix(fpath, inputDir+"/pages"))
+			cat.Basename = path.Base(fpath)
+			if fpath == "/" {
+				fpath = ":root:"
+			}
+			parent, err := tree.FindParent(fpath)
 			if err != nil {
 				return err
 			}
@@ -129,10 +136,10 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Printf("%v categories found\n", 1+tree.CategoryCount())
+	fmt.Printf("%v categories found\n", tree.CategoryCount())
 
 	// read page files (*.md)
-	fmt.Println("Loading pages... ")
+	fmt.Println("\n\x1b[1mLoading pages...\x1b[0m")
 	err = WalkDir(inputDir, func(fpath string) error {
 		if strings.HasSuffix(path.Base(fpath), ".md") {
 			// load file content
@@ -185,7 +192,7 @@ func main() {
 				return nil
 			}
 
-			parent, err := tree.FindParent(strings.TrimPrefix(fpath, inputDir+"/"))
+			parent, err := tree.FindParent(strings.TrimPrefix(fpath, inputDir+"/pages"))
 			if err != nil {
 				return err
 			}
@@ -196,6 +203,8 @@ func main() {
 				parent.Pages = append(parent.Pages, page)
 				page.Category = parent
 			}
+
+			fmt.Println(fpath)
 		}
 		return nil
 	})
@@ -210,7 +219,7 @@ func main() {
 	pageListTemplate := template.Must(template.ParseFiles(inputDir + "/templates/page_list.html"))
 
 	// walk tree
-	fmt.Println("Generating html...")
+	fmt.Println("\n\x1b[1mGenerating html...\x1b[0m")
 	for catQueue := []*Category{tree}; len(catQueue) > 0; catQueue = append(catQueue[1:], catQueue[0].SubCategories...) {
 		// create subdirectories
 		for _, subCat := range catQueue[0].SubCategories {
@@ -252,11 +261,13 @@ func main() {
 				fmt.Println(err)
 				return
 			}
+
+			fmt.Println(page.Path())
 		}
 	}
 
 	// make categories index.html files with catinfo.json if there is no index.html yet
-	fmt.Println("Generating index.html files for categories lacking them...")
+	fmt.Println("\n\x1b[1mGenerating index.html files for categories lacking them...\x1b[0m")
 	for catQueue := []*Category{tree}; len(catQueue) > 0; catQueue = append(catQueue[1:], catQueue[0].SubCategories...) {
 		// if there is already an index.md: do nothing
 		mustContinue := false
@@ -311,6 +322,8 @@ func main() {
 			fmt.Println(err)
 			return
 		}
+
+		fmt.Println(catQueue[0].Path() + "index.html")
 	}
 
 	// make tags html files
@@ -363,6 +376,7 @@ func main() {
 		}
 	}
 
+	fmt.Println("\n\x1b[1mCopying resource directories...\x1b[0m")
 	// copy /media
 	if DirectoryExists(inputDir + "/media") {
 		fmt.Println("Copying /media")

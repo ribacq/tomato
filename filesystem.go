@@ -45,10 +45,7 @@ func ReadFile(name string) ([]byte, error) {
 // In every directory, it first calls the callback on every regular file.
 // Then it pushes all subdirectories to the queue.
 func WalkDir(root string, callback func(fname string) error) error {
-	var dirQueue []string
-	dirQueue = append(dirQueue, root)
-
-	for len(dirQueue) > 0 {
+	for dirQueue := []string{root}; len(dirQueue) > 0; dirQueue = dirQueue[1:] {
 		dir, err := os.Open(dirQueue[0])
 		if err != nil {
 			fmt.Println(err)
@@ -72,7 +69,6 @@ func WalkDir(root string, callback func(fname string) error) error {
 				dirQueue = append(dirQueue, dirQueue[0]+"/"+name)
 			}
 		}
-		dirQueue = dirQueue[1:]
 	}
 	return nil
 }

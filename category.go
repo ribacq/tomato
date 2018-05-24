@@ -45,11 +45,11 @@ func (cat Category) NavHelper(page Page, showPages bool) string {
 // FindParent returns the parent category a given file should go in.
 // A nil error and a nil parent mean the given path is the root.
 func (tree *Category) FindParent(fpath string) (*Category, error) {
-	if fpath == "." {
+	if fpath == ":root:" {
 		return nil, nil
 	}
 
-	fpath = path.Clean(path.Dir(fpath))
+	fpath = path.Dir(fpath)
 
 	if fpath == "/" {
 		return tree, nil
@@ -114,7 +114,7 @@ func (cat *Category) CategoryCount() int {
 
 // Path returns a slash-seperated path for the category, starting from the root.
 func (cat *Category) Path() string {
-	if cat == nil || cat.Parent == nil {
+	if cat == nil || cat.Parent == nil || cat.Basename == "/" {
 		return "/"
 	}
 	return cat.Parent.Path() + cat.Basename + "/"
