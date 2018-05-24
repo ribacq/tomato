@@ -7,8 +7,9 @@
 	{{ if .Category }}
 		<p>
 			Subcategories:
-			{{ range .Category.SubCategories }}
-				<a href="{{ $page.PathToRoot }}{{ .Path }}">{{ .Name }}</a>
+			{{ range $i, $cat := .Category.SubCategories }}
+				{{ if gt $i 0 }}|{{ end }}
+				<a href="{{ $page.PathToRoot }}{{ $cat.Path }}">{{ $cat.Name }}</a>
 			{{ end }}
 		</p>
 	{{ end }}
