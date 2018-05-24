@@ -3,30 +3,31 @@
 <div class="page-list">
 	<h1>{{ .Title }}</h1>
 	<p>{{ len .Pages }} page{{ if ge (len .Pages) 2 }}s{{ end }}</p>
-
-	{{ if len .Tags }}
-		<h2>Tags</h2>
-		<ul class="tags">
-		{{ range .Tags }}
-			<li><a href="{{ $page.PathToRoot }}/tag/{{ . }}.html">{{ . }}</a></li>
-		{{ end }}
-		</ul>
-	{{ end }}
-
+	
 	{{ if .Category }}
-		<h2>Everything under {{ .Category.Name }}</h2>
-		{{ .Category.NavHelper .Page true }}
+		<p>
+			Subcategories:
+			{{ range .Category.SubCategories }}
+				<a href="{{ $page.PathToRoot }}{{ .Path }}">{{ .Name }}</a>
+			{{ end }}
+		</p>
 	{{ end }}
 
 	{{ if len .Pages }}
-		<h2>Pages</h2>
 		<div class="cards">
 		{{ range .Pages }}
 			<div class="card">
-				<h2 class="card-title"><a href="{{ $page.PathToRoot }}{{ .Path }}">{{ .Title }}</a></h2>
+				<h2 class="card-title" {{ if .PathToFeaturedImage }}style="background-image: url('{{ $page.PathToRoot }}{{ .PathToFeaturedImage }}')"{{ end }}><a href="{{ $page.PathToRoot }}{{ .Path }}">{{ .Title }}</a></h2>
 				<div class="card-content">
-					{{ .Author.Helper }}
+					{{ .PathHelper $page }}
+					<br>
 					{{ .Date }}
+					<ul class="tags">
+					{{ range .Tags }}
+						<li><a href="{{ $page.PathToRoot }}/tag/{{ . }}.html">{{ . }}</a></li>
+					{{ end }}
+					</ul>
+					{{ .Author.Helper }}
 				</div>
 			</div>
 		{{ end }}

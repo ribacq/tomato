@@ -311,7 +311,6 @@ func main() {
 			},
 			"Category": catQueue[0],
 			"Title":    "Category: " + catQueue[0].Name,
-			"Tags":     catQueue[0].Tags(),
 		})
 		if err != nil {
 			fmt.Println(err)
@@ -363,7 +362,6 @@ func main() {
 				Category: tree,
 				Basename: "tag/" + tag,
 			},
-			"Tags": []string{tag},
 		})
 		if err != nil {
 			fmt.Println(err)

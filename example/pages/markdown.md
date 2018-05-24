@@ -1,6 +1,6 @@
 #!author: Quentin Ribac
 #!date: 2018-05-19
-#!tags: help
+#!tags: help, blog
 
 # Markdown
 [Markdown](https://daringfireball.net/projects/markdown) is a simple syntax that allows to do many things:
