@@ -4,3 +4,5 @@
 
 # Tomato
 This is my super cool website generator!
+
+!![tomatoes](/media/img/tomatoes.jpg)

@@ -4,12 +4,12 @@
 	<h1>{{ .Title }}</h1>
 	<p>{{ len .Pages }} page{{ if ge (len .Pages) 2 }}s{{ end }}</p>
 	
-	{{ if .Category }}
+	{{ if .Category.SubCategories }}
 		<p>
 			Subcategories:
 			{{ range $i, $cat := .Category.SubCategories }}
 				{{ if gt $i 0 }}|{{ end }}
-				<a href="{{ $page.PathToRoot }}{{ $cat.Path }}">{{ $cat.Name }}</a>
+				<a href="{{ $page.PathToRoot }}{{ $cat.Path }}index.html">{{ $cat.Name }}</a>
 			{{ end }}
 		</p>
 	{{ end }}

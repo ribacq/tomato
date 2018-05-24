@@ -7,4 +7,4 @@ This is the name of a fantasy setting. It includes:
 
 * a map
 * a story
-* a [conlang](https://github.com/ribacq/deeree)
+* a [conlang](https://github.com/ribacq/deeree/blob/master/deeree.pdf)
