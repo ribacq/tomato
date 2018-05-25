@@ -136,7 +136,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Printf("%v categories found\n", tree.CategoryCount())
+	fmt.Printf("%v categories found\n", 1+tree.CategoryCount())
 
 	// read page files (*.md)
 	fmt.Println("\n\x1b[1mLoading pages...\x1b[0m")
