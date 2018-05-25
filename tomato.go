@@ -250,7 +250,7 @@ func main() {
 				fmt.Println(err)
 				return
 			}
-			contentTemplate := template.Must(template.New("Content").Parse(string(Html(page.Content, *page))))
+			contentTemplate := template.Must(template.New("Content").Parse(string(page.ContentHelper())))
 			err = contentTemplate.ExecuteTemplate(pageFile, "Content", arg)
 			if err != nil {
 				fmt.Println(err)

@@ -20,6 +20,11 @@
 			<div class="card">
 				<h2 class="card-title" {{ if .PathToFeaturedImage }}style="background-image: url('{{ $page.PathToRoot }}{{ .PathToFeaturedImage }}')"{{ end }}><a href="{{ $page.PathToRoot }}{{ .Path }}">{{ .Title }}</a></h2>
 				<div class="card-content">
+					<p>
+						{{ .Excerpt }}
+						<br>
+						<a href="{{ $page.PathToRoot }}{{ .Path }}">Read more…</a>
+					</p>
 					{{ .PathHelper $page }}
 					<br>
 					{{ .Date }}

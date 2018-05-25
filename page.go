@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 )
 
@@ -23,6 +24,18 @@ type Page struct {
 // ContentHelper prints the page in html.
 func (page Page) ContentHelper() string {
 	return string(Html(page.Content, page))
+}
+
+// Excerpt returns an excerpt of the beginning of the page without any html formatting.
+// Its maximum length is 140 characters.
+func (page Page) Excerpt() string {
+	exc := string(Raw(page.Content))
+	bracesRE := regexp.MustCompile("{{.*}}")
+	exc = bracesRE.ReplaceAllString(exc, "")
+	if len(exc) > 140 {
+		exc = exc[:140] + "…"
+	}
+	return exc
 }
 
 // PathHelper prints the path from the root to the current page in html.
