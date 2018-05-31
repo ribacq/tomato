@@ -28,7 +28,7 @@ func main() {
 	// exit if no input directory was given
 	if len(os.Args) < 2 {
 		fmt.Println("Error: please specify an input directory.")
-		return
+		os.Exit(1)
 	}
 
 	// exit if incorrect input directory was given
@@ -36,11 +36,11 @@ func main() {
 		inputDir = path.Clean(os.Args[1])
 	} else {
 		fmt.Println("Error: " + os.Args[1] + " is not a directory")
-		return
+		os.Exit(1)
 	}
 	if inputDir == "/" {
 		fmt.Println("Error: cannot use /.")
-		return
+		os.Exit(1)
 	}
 
 	fmt.Println("Using " + inputDir)
@@ -49,7 +49,7 @@ func main() {
 	outputDir = inputDir + "_html"
 	if FileExists(outputDir) {
 		fmt.Println("Error: " + outputDir + " already exists and is not a directory.")
-		return
+		os.Exit(1)
 	}
 	if DirectoryExists(outputDir) {
 		fmt.Println("Deleting pre-existing output directory")
@@ -57,18 +57,18 @@ func main() {
 		err := rmOutput.Start()
 		if err != nil {
 			fmt.Println(err)
-			return
+			os.Exit(1)
 		}
 		err = rmOutput.Wait()
 		if err != nil {
 			fmt.Println(err)
-			return
+			os.Exit(1)
 		}
 	}
 	err := os.Mkdir(outputDir, 0775)
 	if err != nil {
 		fmt.Println(err)
-		return
+		os.Exit(1)
 	}
 
 	fmt.Println("Output will be written to " + outputDir)
@@ -83,17 +83,17 @@ func main() {
 		f, err := os.Open(inputDir + "/siteinfo.json")
 		if err != nil {
 			fmt.Println("Error: could not open /siteinfo.json")
-			return
+			os.Exit(1)
 		}
 		jsonDecoder := json.NewDecoder(f)
 		err = jsonDecoder.Decode(&siteinfo)
 		if err != nil {
 			fmt.Println("Error: incorrect /siteinfo.json")
-			return
+			os.Exit(1)
 		}
 	} else {
 		fmt.Println("Error: no /siteinfo.json found")
-		return
+		os.Exit(1)
 	}
 	fmt.Printf("Done, %v authors found.\n", len(siteinfo.Authors))
 
@@ -134,7 +134,7 @@ func main() {
 	})
 	if err != nil {
 		fmt.Println(err)
-		return
+		os.Exit(1)
 	}
 	fmt.Printf("%v categories found\n", 1+tree.CategoryCount())
 
@@ -210,7 +210,7 @@ func main() {
 	})
 	if err != nil {
 		fmt.Println(err)
-		return
+		os.Exit(1)
 	}
 	fmt.Printf("%v pages found\n", tree.PageCount())
 
@@ -227,7 +227,7 @@ func main() {
 				err := os.Mkdir(outputDir+subCat.Path(), 0755)
 				if err != nil {
 					fmt.Println(err)
-					return
+					os.Exit(1)
 				}
 			}
 		}
@@ -237,7 +237,7 @@ func main() {
 			pageFile, err := os.OpenFile(outputDir+page.Path(), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0664)
 			if err != nil {
 				fmt.Println(err)
-				return
+				os.Exit(1)
 			}
 
 			arg := map[string]interface{}{
@@ -248,18 +248,18 @@ func main() {
 			err = fullPageTemplate.ExecuteTemplate(pageFile, "Header", arg)
 			if err != nil {
 				fmt.Println(err)
-				return
+				os.Exit(1)
 			}
 			contentTemplate := template.Must(template.New("Content").Parse(string(page.ContentHelper())))
 			err = contentTemplate.ExecuteTemplate(pageFile, "Content", arg)
 			if err != nil {
 				fmt.Println(err)
-				return
+				os.Exit(1)
 			}
 			err = fullPageTemplate.ExecuteTemplate(pageFile, "Footer", arg)
 			if err != nil {
 				fmt.Println(err)
-				return
+				os.Exit(1)
 			}
 
 			fmt.Println(page.Path())
@@ -284,7 +284,7 @@ func main() {
 		catFile, err := os.OpenFile(outputDir+catQueue[0].Path()+"index.html", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0664)
 		if err != nil {
 			fmt.Println(err)
-			return
+			os.Exit(1)
 		}
 
 		arg := map[string]interface{}{
@@ -301,7 +301,7 @@ func main() {
 		err = fullPageTemplate.ExecuteTemplate(catFile, "Header", arg)
 		if err != nil {
 			fmt.Println(err)
-			return
+			os.Exit(1)
 		}
 		err = pageListTemplate.ExecuteTemplate(catFile, "PageList", map[string]interface{}{
 			"Pages": catQueue[0].Pages,
@@ -314,12 +314,12 @@ func main() {
 		})
 		if err != nil {
 			fmt.Println(err)
-			return
+			os.Exit(1)
 		}
 		err = fullPageTemplate.ExecuteTemplate(catFile, "Footer", arg)
 		if err != nil {
 			fmt.Println(err)
-			return
+			os.Exit(1)
 		}
 
 		fmt.Println(catQueue[0].Path() + "index.html")
@@ -330,14 +330,14 @@ func main() {
 		err := os.Mkdir(outputDir+"/tag", 0755)
 		if err != nil {
 			fmt.Println(err)
-			return
+			os.Exit(1)
 		}
 	}
 	for _, tag := range tree.Tags() {
 		tagFile, err := os.OpenFile(outputDir+"/tag/"+tag+".html", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0664)
 		if err != nil {
 			fmt.Println(err)
-			return
+			os.Exit(1)
 		}
 		arg := map[string]interface{}{
 			"Siteinfo": siteinfo,
@@ -353,7 +353,7 @@ func main() {
 		err = fullPageTemplate.ExecuteTemplate(tagFile, "Header", arg)
 		if err != nil {
 			fmt.Println(err)
-			return
+			os.Exit(1)
 		}
 		err = pageListTemplate.ExecuteTemplate(tagFile, "PageList", map[string]interface{}{
 			"Pages": tree.FilterByTags([]string{tag}),
@@ -365,12 +365,12 @@ func main() {
 		})
 		if err != nil {
 			fmt.Println(err)
-			return
+			os.Exit(1)
 		}
 		err = fullPageTemplate.ExecuteTemplate(tagFile, "Footer", arg)
 		if err != nil {
 			fmt.Println(err)
-			return
+			os.Exit(1)
 		}
 	}
 
@@ -382,12 +382,12 @@ func main() {
 		err = cpMedia.Start()
 		if err != nil {
 			fmt.Println(err)
-			return
+			os.Exit(1)
 		}
 		err = cpMedia.Wait()
 		if err != nil {
 			fmt.Println(err)
-			return
+			os.Exit(1)
 		}
 	}
 
@@ -398,12 +398,12 @@ func main() {
 		err = cpAssets.Start()
 		if err != nil {
 			fmt.Println(err)
-			return
+			os.Exit(1)
 		}
 		err = cpAssets.Wait()
 		if err != nil {
 			fmt.Println(err)
-			return
+			os.Exit(1)
 		}
 	}
 }
