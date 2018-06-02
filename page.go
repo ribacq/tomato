@@ -13,7 +13,7 @@ type Page struct {
 	Category            *Category
 	Basename            string
 	Title               string
-	Author              *Author
+	Authors             []*Author
 	Date                string
 	Tags                []string
 	Draft               bool

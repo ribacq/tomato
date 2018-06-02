@@ -1,4 +1,4 @@
-#!author: Quentin Ribac
+#!author: Quentin Ribac, Jirsad
 #!date: 2018-05-18
 #!tags: blog
 

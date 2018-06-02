@@ -149,15 +149,15 @@ func main() {
 			}
 
 			// parse meta and remove them from content
-			titleRE := regexp.MustCompile("# .+\\n")
-			authorRE := regexp.MustCompile("#!author: .+\\n")
-			dateRE := regexp.MustCompile("#!date: (\\d{4}-\\d{2}-\\d{2})\\n")
-			tagsRE := regexp.MustCompile("#!tags: .+\\n")
-			draftRE := regexp.MustCompile("#!draft\\n")
+			titleRE := regexp.MustCompile("(?m)^# .+$")
+			authorRE := regexp.MustCompile("(?m)^#!author: (.+)(, .+)*$")
+			dateRE := regexp.MustCompile("(?m)^#!date: (\\d{4}-\\d{2}-\\d{2})$")
+			tagsRE := regexp.MustCompile("(?m)^#!tags: .+$")
+			draftRE := regexp.MustCompile("(?m)^#!draft$")
 			featuredImageLinkRE := regexp.MustCompile("!!\\[(.+)\\]\\((.+)\\)")
 
 			title := strings.Trim(strings.TrimPrefix(string(titleRE.Find(content)), "#"), " \n")
-			author := strings.Trim(strings.TrimPrefix(string(authorRE.Find(content)), "#!author:"), " \n")
+			authorsNames := strings.Split(strings.Trim(strings.TrimPrefix(string(authorRE.Find(content)), "#!author:"), " \n"), ", ")
 			date := strings.Trim(strings.TrimPrefix(string(dateRE.Find(content)), "#!date:"), " \n")
 			tags := strings.Split(strings.Trim(strings.TrimPrefix(string(tagsRE.Find(content)), "#!tags:"), " \n"), ",")
 			for i := 0; i < len(tags); i++ {
@@ -181,11 +181,15 @@ func main() {
 			content = featuredImageLinkRE.ReplaceAll(content, []byte("![$1]($2)"))
 
 			// add to tree as a Page struct
-			au, err := siteinfo.FindAuthor(author)
-			if err != nil {
-				return err
+			var authors []*Author
+			for i := range authorsNames {
+				author, err := siteinfo.FindAuthor(authorsNames[i])
+				if err != nil {
+					return err
+				}
+				authors = append(authors, author)
 			}
-			page := &Page{nil, strings.TrimSuffix(path.Base(fpath), ".md"), title, au, date, tags, draft, content, pathToFeaturedImage}
+			page := &Page{nil, strings.TrimSuffix(path.Base(fpath), ".md"), title, authors, date, tags, draft, content, pathToFeaturedImage}
 
 			if page.Draft {
 				fmt.Printf("Skipping draft: ‘%s’\n", page.Title)
@@ -291,7 +295,7 @@ func main() {
 			"Siteinfo": siteinfo,
 			"Page": &Page{
 				Title:    "Category : " + catQueue[0].Name,
-				Author:   &siteinfo.Authors[0],
+				Authors:  []*Author{&siteinfo.Authors[0]},
 				Tags:     catQueue[0].Tags(),
 				Category: catQueue[0],
 				Basename: "index",
@@ -343,7 +347,7 @@ func main() {
 			"Siteinfo": siteinfo,
 			"Page": &Page{
 				Title:    "Tag: " + tag,
-				Author:   &siteinfo.Authors[0],
+				Authors:  []*Author{&siteinfo.Authors[0]},
 				Tags:     []string{tag},
 				Category: tree,
 				Basename: "tag/" + tag,

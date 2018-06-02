@@ -32,7 +32,7 @@
 				<p>
 					{{ .Page.PathHelper .Page }}
 				</p>
-				{{ .Page.Author.Helper }}
+				{{ range .Page.Authors }}{{ .Helper }}{{ end }}
 				<time>{{ .Page.Date }}</time>
 				<ul class="tags">
 				{{ range .Page.Tags }}
