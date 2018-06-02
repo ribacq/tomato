@@ -48,13 +48,13 @@ func WalkDir(root string, callback func(fname string) error) error {
 	for dirQueue := []string{root}; len(dirQueue) > 0; dirQueue = dirQueue[1:] {
 		dir, err := os.Open(dirQueue[0])
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(os.Stderr, err)
 			return err
 		}
 
 		names, err := dir.Readdirnames(0)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(os.Stderr, err)
 			return err
 		}
 
@@ -62,7 +62,7 @@ func WalkDir(root string, callback func(fname string) error) error {
 			if FileExists(dirQueue[0] + "/" + name) {
 				err = callback(dirQueue[0] + "/" + name)
 				if err != nil {
-					fmt.Println(err)
+					fmt.Fprintln(os.Stderr, err)
 					return err
 				}
 			} else if DirectoryExists(dirQueue[0] + "/" + name) {

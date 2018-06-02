@@ -27,7 +27,7 @@ func main() {
 
 	// exit if no input directory was given
 	if len(os.Args) < 2 {
-		fmt.Frintln(os.Stderr, "Error: please specify an input directory.")
+		fmt.Fprintln(os.Stderr, "Error: please specify an input directory.")
 		os.Exit(1)
 	}
 
