@@ -1,10 +1,11 @@
 /* colors */
+/* https://www.materialpalette.com/blue-grey/amber */
 body{
 	--primary: #607d8b;
 	--dark-primary: #455a64;
 	--light-primary: #cfd8dc;
-	--text-icons: #ffffff;
 	--accent: #ffc107;
+	--text-icons: #ffffff;
 	--primary-text: #212121;
 	--secondary-text: #757575;
 	--divider: #bdbdbd;
