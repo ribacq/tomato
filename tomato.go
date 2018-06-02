@@ -27,7 +27,7 @@ func main() {
 
 	// exit if no input directory was given
 	if len(os.Args) < 2 {
-		fmt.Println("Error: please specify an input directory.")
+		fmt.Frintln(os.Stderr, "Error: please specify an input directory.")
 		os.Exit(1)
 	}
 
@@ -35,11 +35,11 @@ func main() {
 	if DirectoryExists(os.Args[1]) {
 		inputDir = path.Clean(os.Args[1])
 	} else {
-		fmt.Println("Error: " + os.Args[1] + " is not a directory")
+		fmt.Fprintln(os.Stderr, "Error: "+os.Args[1]+" is not a directory.")
 		os.Exit(1)
 	}
 	if inputDir == "/" {
-		fmt.Println("Error: cannot use /.")
+		fmt.Fprintln(os.Stderr, "Error: cannot use root (/) as input directory.")
 		os.Exit(1)
 	}
 
@@ -48,7 +48,7 @@ func main() {
 	// set and maybe create output directory
 	outputDir = inputDir + "_html"
 	if FileExists(outputDir) {
-		fmt.Println("Error: " + outputDir + " already exists and is not a directory.")
+		fmt.Fprintln(os.Stderr, "Error: "+outputDir+" already exists and is not a directory.")
 		os.Exit(1)
 	}
 	if DirectoryExists(outputDir) {
@@ -56,18 +56,18 @@ func main() {
 		rmOutput := exec.Command("rm", "-rf", outputDir)
 		err := rmOutput.Start()
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 		err = rmOutput.Wait()
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 	}
 	err := os.Mkdir(outputDir, 0775)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
@@ -82,17 +82,17 @@ func main() {
 	if FileExists(inputDir + "/siteinfo.json") {
 		f, err := os.Open(inputDir + "/siteinfo.json")
 		if err != nil {
-			fmt.Println("Error: could not open /siteinfo.json")
+			fmt.Fprintln(os.Stderr, "Error: could not open /siteinfo.json")
 			os.Exit(1)
 		}
 		jsonDecoder := json.NewDecoder(f)
 		err = jsonDecoder.Decode(&siteinfo)
 		if err != nil {
-			fmt.Println("Error: incorrect /siteinfo.json")
+			fmt.Fprintln(os.Stderr, "Error: incorrect /siteinfo.json")
 			os.Exit(1)
 		}
 	} else {
-		fmt.Println("Error: no /siteinfo.json found")
+		fmt.Fprintln(os.Stderr, "Error: no /siteinfo.json found")
 		os.Exit(1)
 	}
 	fmt.Printf("Done, %v authors found.\n", len(siteinfo.Authors))
@@ -133,7 +133,7 @@ func main() {
 		return nil
 	})
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 	fmt.Printf("%v categories found\n", 1+tree.CategoryCount())
@@ -209,7 +209,7 @@ func main() {
 		return nil
 	})
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 	fmt.Printf("%v pages found\n", tree.PageCount())
@@ -226,7 +226,7 @@ func main() {
 			if !DirectoryExists(outputDir + subCat.Path()) {
 				err := os.Mkdir(outputDir+subCat.Path(), 0755)
 				if err != nil {
-					fmt.Println(err)
+					fmt.Fprintln(os.Stderr, err)
 					os.Exit(1)
 				}
 			}
@@ -236,7 +236,7 @@ func main() {
 		for _, page := range catQueue[0].Pages {
 			pageFile, err := os.OpenFile(outputDir+page.Path(), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0664)
 			if err != nil {
-				fmt.Println(err)
+				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
 			}
 
@@ -247,18 +247,18 @@ func main() {
 			}
 			err = fullPageTemplate.ExecuteTemplate(pageFile, "Header", arg)
 			if err != nil {
-				fmt.Println(err)
+				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
 			}
 			contentTemplate := template.Must(template.New("Content").Parse(string(page.ContentHelper())))
 			err = contentTemplate.ExecuteTemplate(pageFile, "Content", arg)
 			if err != nil {
-				fmt.Println(err)
+				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
 			}
 			err = fullPageTemplate.ExecuteTemplate(pageFile, "Footer", arg)
 			if err != nil {
-				fmt.Println(err)
+				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
 			}
 
@@ -283,7 +283,7 @@ func main() {
 
 		catFile, err := os.OpenFile(outputDir+catQueue[0].Path()+"index.html", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0664)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 
@@ -300,7 +300,7 @@ func main() {
 		}
 		err = fullPageTemplate.ExecuteTemplate(catFile, "Header", arg)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 		err = pageListTemplate.ExecuteTemplate(catFile, "PageList", map[string]interface{}{
@@ -313,12 +313,12 @@ func main() {
 			"Title":    "Category: " + catQueue[0].Name,
 		})
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 		err = fullPageTemplate.ExecuteTemplate(catFile, "Footer", arg)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 
@@ -329,14 +329,14 @@ func main() {
 	if !DirectoryExists(outputDir + "/tag") {
 		err := os.Mkdir(outputDir+"/tag", 0755)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 	}
 	for _, tag := range tree.Tags() {
 		tagFile, err := os.OpenFile(outputDir+"/tag/"+tag+".html", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0664)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 		arg := map[string]interface{}{
@@ -352,7 +352,7 @@ func main() {
 		}
 		err = fullPageTemplate.ExecuteTemplate(tagFile, "Header", arg)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 		err = pageListTemplate.ExecuteTemplate(tagFile, "PageList", map[string]interface{}{
@@ -364,12 +364,12 @@ func main() {
 			},
 		})
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 		err = fullPageTemplate.ExecuteTemplate(tagFile, "Footer", arg)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 	}
@@ -381,12 +381,12 @@ func main() {
 		cpMedia := exec.Command("cp", "-Rv", inputDir+"/media", outputDir)
 		err = cpMedia.Start()
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 		err = cpMedia.Wait()
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 	}
@@ -397,12 +397,12 @@ func main() {
 		cpAssets := exec.Command("cp", "-Rv", inputDir+"/assets", outputDir)
 		err = cpAssets.Start()
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 		err = cpAssets.Wait()
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 	}
