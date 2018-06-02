@@ -1,6 +1,6 @@
 #!author: Quentin Ribac
 #!date: 2018-05-19
-#!tags: project
+#!tags: project, golang
 
 # Tomato
 This is my super cool website generator!

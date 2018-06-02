@@ -22,8 +22,8 @@ type Page struct {
 }
 
 // ContentHelper prints the page in html.
-func (page Page) ContentHelper() string {
-	return string(Html(page.Content, page))
+func (page *Page) ContentHelper() string {
+	return strings.Replace(string(Html(page.Content, page)), "&quot;", "\"", -1)
 }
 
 // Excerpt returns an excerpt of the beginning of the page without any html formatting.
@@ -32,8 +32,8 @@ func (page Page) Excerpt() string {
 	exc := string(Raw(page.Content))
 	bracesRE := regexp.MustCompile("{{.*}}")
 	exc = bracesRE.ReplaceAllString(exc, "")
-	if len(exc) > 140 {
-		exc = exc[:140] + "…"
+	if len(exc) > 280 {
+		exc = exc[:280] + "…"
 	}
 	return exc
 }

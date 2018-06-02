@@ -39,7 +39,7 @@ func (cat *Category) mdTree(prefix string, showPages bool) []byte {
 }
 
 // NavHelper returns the tree returned by mdTree, converted to Html format.
-func (cat Category) NavHelper(page Page, showPages bool) string {
+func (cat Category) NavHelper(page *Page, showPages bool) string {
 	return string(Html(cat.mdTree("", showPages), page))
 }
 
@@ -166,7 +166,7 @@ func (cat *Category) RecentPages(n int) (pages []*Page) {
 		}
 		return ti.After(tj)
 	})
-	if len(pages) > n {
+	if n >= 0 && len(pages) > n {
 		return pages[:n]
 	}
 	return pages

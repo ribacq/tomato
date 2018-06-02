@@ -226,10 +226,11 @@ th, td {
 div.cards {
 	display: flex;
 	flex-flow: row wrap;
+	justify-content: space-between;
 }
 
 div.card {
-	flex: 1 0 100px;
+	flex: 0 1 442px;
 	background: var(--light-primary);
 	margin: 20px;
 	border: 1px solid var(--primary);

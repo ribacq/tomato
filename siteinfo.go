@@ -23,17 +23,17 @@ func (siteinfo Siteinfo) MainAuthorHelper() string {
 }
 
 // CopyrightHelper prints html for the copyright information.
-func (siteinfo Siteinfo) CopyrightHelper(page Page) string {
+func (siteinfo Siteinfo) CopyrightHelper(page *Page) string {
 	return string(Html([]byte(siteinfo.Copyright), page))
 }
 
 // SubtitleHelper prints html for the site subtitle.
-func (siteinfo Siteinfo) SubtitleHelper(page Page) string {
+func (siteinfo Siteinfo) SubtitleHelper(page *Page) string {
 	return string(Html([]byte(siteinfo.Subtitle), page))
 }
 
 // DescriptionHelper prints html for the site description.
-func (siteinfo Siteinfo) DescriptionHelper(page Page) string {
+func (siteinfo Siteinfo) DescriptionHelper(page *Page) string {
 	return string(Html([]byte(siteinfo.Description), page))
 }
 

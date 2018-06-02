@@ -219,8 +219,7 @@ func main() {
 	fmt.Printf("%v pages found\n", tree.PageCount())
 
 	// load templates
-	fullPageTemplate := template.Must(template.ParseFiles(inputDir + "/templates/full_page.html"))
-	pageListTemplate := template.Must(template.ParseFiles(inputDir + "/templates/page_list.html"))
+	templates := template.Must(template.ParseGlob(inputDir + "/templates/*.html"))
 
 	// walk tree
 	fmt.Println("\n\x1b[1mGenerating html...\x1b[0m")
@@ -249,18 +248,19 @@ func main() {
 				"Page":     page,
 				"Tree":     tree,
 			}
-			err = fullPageTemplate.ExecuteTemplate(pageFile, "Header", arg)
+			err = templates.ExecuteTemplate(pageFile, "Header", arg)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
 			}
-			contentTemplate := template.Must(template.New("Content").Parse(string(page.ContentHelper())))
-			err = contentTemplate.ExecuteTemplate(pageFile, "Content", arg)
+			templates = template.Must(templates.Parse("{{ define \"Content\" }}" + page.ContentHelper() + "{{ end }}"))
+			err = templates.ExecuteTemplate(pageFile, "Content", arg)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
 			}
-			err = fullPageTemplate.ExecuteTemplate(pageFile, "Footer", arg)
+			template.Must(templates.Parse("{{ define \"Content\" }}{{ end }}"))
+			err = templates.ExecuteTemplate(pageFile, "Footer", arg)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
@@ -294,33 +294,25 @@ func main() {
 		arg := map[string]interface{}{
 			"Siteinfo": siteinfo,
 			"Page": &Page{
+				Category: catQueue[0],
+				Basename: "index",
 				Title:    "Category : " + catQueue[0].Name,
 				Authors:  []*Author{&siteinfo.Authors[0]},
 				Tags:     catQueue[0].Tags(),
-				Category: catQueue[0],
-				Basename: "index",
 			},
 			"Tree": tree,
 		}
-		err = fullPageTemplate.ExecuteTemplate(catFile, "Header", arg)
+		err = templates.ExecuteTemplate(catFile, "Header", arg)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
-		err = pageListTemplate.ExecuteTemplate(catFile, "PageList", map[string]interface{}{
-			"Pages": catQueue[0].Pages,
-			"Page": &Page{
-				Category: catQueue[0],
-				Basename: "index",
-			},
-			"Category": catQueue[0],
-			"Title":    "Category: " + catQueue[0].Name,
-		})
+		err = templates.ExecuteTemplate(catFile, "PageList", arg)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
-		err = fullPageTemplate.ExecuteTemplate(catFile, "Footer", arg)
+		err = templates.ExecuteTemplate(catFile, "Footer", arg)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
@@ -346,32 +338,31 @@ func main() {
 		arg := map[string]interface{}{
 			"Siteinfo": siteinfo,
 			"Page": &Page{
+				Category: &Category{
+					Parent:      tree,
+					Basename:    "tag",
+					Name:        "Tags",
+					Description: "Pages tagged with " + tag,
+					Pages:       tree.FilterByTags([]string{tag}),
+				},
+				Basename: tag,
 				Title:    "Tag: " + tag,
 				Authors:  []*Author{&siteinfo.Authors[0]},
 				Tags:     []string{tag},
-				Category: tree,
-				Basename: "tag/" + tag,
 			},
 			"Tree": tree,
 		}
-		err = fullPageTemplate.ExecuteTemplate(tagFile, "Header", arg)
+		err = templates.ExecuteTemplate(tagFile, "Header", arg)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
-		err = pageListTemplate.ExecuteTemplate(tagFile, "PageList", map[string]interface{}{
-			"Pages": tree.FilterByTags([]string{tag}),
-			"Title": "Tag: " + tag,
-			"Page": &Page{
-				Category: tree,
-				Basename: "tag/" + tag,
-			},
-		})
+		err = templates.ExecuteTemplate(tagFile, "PageList", arg)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
-		err = fullPageTemplate.ExecuteTemplate(tagFile, "Footer", arg)
+		err = templates.ExecuteTemplate(tagFile, "Footer", arg)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)

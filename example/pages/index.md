@@ -1,5 +1,5 @@
 #!author: Quentin Ribac, Jirsad
-#!date: 2018-05-18
+#!date: 2018-06-02
 #!tags: blog
 
 # Hello, world!
@@ -7,6 +7,5 @@ This is a statically generated website using [Tomato](https://github.com/ribacq/
 
 If you need help with the syntax, [there is help](/markdown.html).
 
-Look at those beautiful tomatoes:
-
-!![Shiny crimson tomatoes](/media/img/tomatoes.jpg)
+## Recent pages
+{{ template "PageList" . }}

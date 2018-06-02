@@ -1,42 +1,32 @@
 {{ define "PageList" }}
 {{ $page := .Page }}
+{{ $pages := .Page.Category.RecentPages -1 }}
 <div class="page-list">
-	<h1>{{ .Title }}</h1>
-	<p>{{ len .Pages }} page{{ if ge (len .Pages) 2 }}s{{ end }}</p>
-	
-	{{ if .Category.SubCategories }}
-		<p>
-			Subcategories:
-			{{ range $i, $cat := .Category.SubCategories }}
-				{{ if gt $i 0 }}|{{ end }}
-				<a href="{{ $page.PathToRoot }}{{ $cat.Path }}index.html">{{ $cat.Name }}</a>
-			{{ end }}
-		</p>
-	{{ end }}
-
-	{{ if len .Pages }}
+	{{ if len $pages }}
 		<div class="cards">
-		{{ range .Pages }}
-			<div class="card">
-				<h2 class="card-title" {{ if .PathToFeaturedImage }}style="background-image: url('{{ $page.PathToRoot }}{{ .PathToFeaturedImage }}')"{{ end }}><a href="{{ $page.PathToRoot }}{{ .Path }}">{{ .Title }}</a></h2>
-				<div class="card-content">
-					<p>
-						{{ .Excerpt }}
-						<br>
-						<a href="{{ $page.PathToRoot }}{{ .Path }}">Read more…</a>
-					</p>
-					{{ .PathHelper $page }}
-					<br>
-					{{ .Date }}
-					<ul class="tags">
-					{{ range .Tags }}
-						<li><a href="{{ $page.PathToRoot }}/tag/{{ . }}.html">{{ . }}</a></li>
-					{{ end }}
-					</ul>
-					{{ range .Authors }}{{ .Helper }}{{ end }}
-				</div>
-			</div>
-		{{ end }}
+			{{ range $pages }}
+				{{ if ne .Path $page.Path }}
+					<div class="card">
+						<h2 class="card-title" {{ if .PathToFeaturedImage }}style="background-image: url('{{ $page.PathToRoot }}{{ .PathToFeaturedImage }}')"{{ end }}><a href="{{ $page.PathToRoot }}{{ .Path }}">{{ .Title }}</a></h2>
+						<div class="card-content">
+							<p>
+								{{ .Excerpt }}
+								<br>
+								<a href="{{ $page.PathToRoot }}{{ .Path }}">Read more…</a>
+							</p>
+							{{ .PathHelper $page }}
+							<br>
+							{{ .Date }}
+							<ul class="tags">
+							{{ range .Tags }}
+								<li><a href="{{ $page.PathToRoot }}/tag/{{ . }}.html">{{ . }}</a></li>
+							{{ end }}
+							</ul>
+							{{ range .Authors }}{{ .Helper }}{{ end }}
+						</div>
+					</div>
+				{{ end }}
+			{{ end }}
 		</div>
 	{{ end }}
 </div>

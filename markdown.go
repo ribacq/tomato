@@ -6,13 +6,18 @@ import (
 	"gopkg.in/russross/blackfriday.v2"
 )
 
-var (
+const (
 	usedExtensions = blackfriday.Tables | blackfriday.FencedCode | blackfriday.Footnotes | blackfriday.Autolink
 )
 
 // Html wraps the blackfriday markdown converter. It takes and returns a slice of bytes.
-func Html(content []byte, page Page) []byte {
-	return blackfriday.Run(content, blackfriday.WithRenderer(blackfriday.NewHTMLRenderer(blackfriday.HTMLRendererParameters{AbsolutePrefix: page.PathToRoot()})), blackfriday.WithExtensions(usedExtensions))
+func Html(content []byte, page *Page) []byte {
+	renderer := blackfriday.NewHTMLRenderer(blackfriday.HTMLRendererParameters{
+		AbsolutePrefix: page.PathToRoot(),
+		Flags:          blackfriday.FootnoteReturnLinks,
+		FootnoteReturnLinkContents: "<sup>&uarr;</sup>",
+	})
+	return blackfriday.Run(content, blackfriday.WithRenderer(renderer), blackfriday.WithExtensions(usedExtensions))
 }
 
 type literalRenderer struct{}
