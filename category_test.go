@@ -37,7 +37,7 @@ func TestCategory_NavHelper(t *testing.T) {
 	}
 	for tci, tc := range testCases {
 		t.Run(fmt.Sprintf("%d", tci), func(t *testing.T) {
-			if got := tc.category.NavHelper(Page{}, tc.showPages); got != tc.want {
+			if got := tc.category.NavHelper(&Page{}, tc.showPages); got != tc.want {
 				t.Errorf("got %s; want %s", got, tc.want)
 			}
 		})

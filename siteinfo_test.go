@@ -32,7 +32,7 @@ func TestSiteinfo_CopyrightHelper(t *testing.T) {
 	}
 	for tci, tc := range testCases {
 		t.Run(fmt.Sprintf("%d", tci), func(t *testing.T) {
-			if got := tc.siteinfo.CopyrightHelper(Page{}); got != tc.want {
+			if got := tc.siteinfo.CopyrightHelper(&Page{}); got != tc.want {
 				t.Errorf("got %s; want %s", got, tc.want)
 			}
 		})
@@ -49,7 +49,7 @@ func TestSiteinfo_SubtitleHelper(t *testing.T) {
 	}
 	for tci, tc := range testCases {
 		t.Run(fmt.Sprintf("%d", tci), func(t *testing.T) {
-			if got := tc.siteinfo.SubtitleHelper(Page{}); got != tc.want {
+			if got := tc.siteinfo.SubtitleHelper(&Page{}); got != tc.want {
 				t.Errorf("got %s; want %s", got, tc.want)
 			}
 		})
@@ -66,7 +66,7 @@ func TestSiteinfo_DescriptionHelper(t *testing.T) {
 	}
 	for tci, tc := range testCases {
 		t.Run(fmt.Sprintf("%d", tci), func(t *testing.T) {
-			if got := tc.siteinfo.DescriptionHelper(Page{}); got != tc.want {
+			if got := tc.siteinfo.DescriptionHelper(&Page{}); got != tc.want {
 				t.Errorf("got %s; want %s", got, tc.want)
 			}
 		})
