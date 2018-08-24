@@ -46,7 +46,11 @@ func main() {
 	fmt.Println("Using " + inputDir)
 
 	// set and maybe create output directory
-	outputDir = inputDir + "_html"
+	if len(os.Args) > 2 && os.Args[2] != inputDir {
+		outputDir = path.Clean(os.Args[2])
+	} else {
+		outputDir = inputDir + "_html"
+	}
 	if FileExists(outputDir) {
 		fmt.Fprintln(os.Stderr, "Error: "+outputDir+" already exists and is not a directory.")
 		os.Exit(1)
