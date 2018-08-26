@@ -1,3 +1,7 @@
+// Tomato static website generator
+// Copyright Quentin Ribac, 2018
+// Free software license can be found in the LICENSE file.
+
 package main
 
 import (

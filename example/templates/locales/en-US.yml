@@ -1,0 +1,13 @@
+en-US:
+    locale_name: English
+    full_page:
+        header:
+            page: Page
+            all_tags: All tags
+            recent_pages: Recent pages
+            about: About
+            languages: Languages
+        footer:
+            tomato: Statically generated with Tomato
+            back_to_top: Back to top
+            no_js: Sorry, you do not seem to have enabled JavaScript.

@@ -1,3 +1,7 @@
+// Tomato static website generator
+// Copyright Quentin Ribac, 2018
+// Free software license can be found in the LICENSE file.
+
 package main
 
 import (
@@ -39,8 +43,8 @@ func (cat *Category) mdTree(prefix string, showPages bool) []byte {
 }
 
 // NavHelper returns the tree returned by mdTree, converted to Html format.
-func (cat Category) NavHelper(page *Page, showPages bool) string {
-	return string(Html(cat.mdTree("", showPages), page))
+func (cat Category) NavHelper(page *Page, showPages bool, localePath string) string {
+	return string(Html(cat.mdTree("", showPages), page, localePath))
 }
 
 // FindParent returns the parent category a given file should go in.

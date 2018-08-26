@@ -1,84 +1,94 @@
 {{ define "Header" }}
 {{ $page := .Page }}
+{{ $localePath := index .Siteinfo.LocalePaths .Locale }}
+{{ $pathToRoot := .Page.PathToRoot $localePath }}
 <!doctype html>
 <html>
 	<head>
 		<meta charset="utf-8">
 		<title>{{ .Page.Title }} — {{ .Siteinfo.Title }}</title>
-		<link rel="stylesheet" type="text/css" href="{{ .Page.PathToRoot }}/assets/style.css">
+		<link rel="stylesheet" type="text/css" href="{{ $pathToRoot }}/assets/style.css">
 	</head>
 	<body>
-		<header {{ if .Page.PathToFeaturedImage }}style="background-image: url('{{ .Page.PathToRoot }}{{ .Page.PathToFeaturedImage }}')"{{ end }}>
-			<h1><a href="{{ .Page.PathToRoot }}/index.html" id="top">{{ .Siteinfo.Title }}</a></h1>
-			<div id="subtitle">{{ .Siteinfo.SubtitleHelper .Page }}</div>
+		<header {{ if .Page.PathToFeaturedImage }}style="background-image: url('{{ $pathToRoot }}{{ .Page.PathToFeaturedImage }}')"{{ end }}>
+			<h1><a href="{{ $pathToRoot }}{{ $localePath }}/index.html" id="top">{{ .Siteinfo.Title }}</a></h1>
+			<div id="subtitle">{{ .Siteinfo.SubtitleHelper .Page .Locale }}</div>
 		</header>
 		<nav>
-			<div class="flowing-menu">{{ .Tree.NavHelper .Page true }}</div>
+			<div class="flowing-menu">{{ .Tree.NavHelper .Page true $localePath }}</div>
 			<ul>
-				<li><a {{ if eq .Page.Path "/index.html" }}class="active"{{ end }} href="{{ .Page.PathToRoot }}{{ .Tree.Path }}index.html">{{ .Tree.Name }}</a></li>
+				<li><a {{ if eq .Page.Path "/index.html" }}class="active"{{ end }} href="{{ $pathToRoot }}{{ $localePath }}{{ .Tree.Path }}index.html">{{ .Tree.Name }}</a></li>
 				{{ range .Tree.Pages }}
 					{{ if ne .Basename "index" }}
-						<li><a {{ if eq $page.Path .Path }}class="active"{{ end }} href="{{ $page.PathToRoot }}{{ .Path }}">{{ .Title }}</a></li>
+						<li><a {{ if eq $page.Path .Path }}class="active"{{ end }} href="{{ $pathToRoot }}{{ $localePath }}{{ .Path }}">{{ .Title }}</a></li>
 					{{ end }}
 				{{ end }}
 				{{ range .Tree.SubCategories }}
-					<li><a {{ if eq $page.Category.Path .Path }}class="active"{{ end }} href="{{ $page.PathToRoot }}{{ .Path }}index.html">{{ .Name }}</a></li>
+					<li><a {{ if eq $page.Category.Path .Path }}class="active"{{ end }} href="{{ $pathToRoot }}{{ $localePath }}{{ .Path }}index.html">{{ .Name }}</a></li>
 				{{ end }}
 			</ul>
 		</nav>
 		<main>
 			<aside>
-				<h2>Page</h2>
+				<h2>{{ t .Locale "full_page.header.page" }}</h2>
 				<p>
-					{{ .Page.PathHelper .Page }}
+					{{ .Page.PathHelper .Page $localePath }}
 				</p>
 				{{ range .Page.Authors }}{{ .Helper }}{{ end }}
 				<time>{{ .Page.Date }}</time>
 				<ul class="tags">
 				{{ range .Page.Tags }}
-					<li><a href="{{ $page.PathToRoot }}/tag/{{ . }}.html">{{ . }}</a></li>
+					<li><a href="{{ $pathToRoot }}{{ $localePath }}/tag/{{ . }}.html">{{ . }}</a></li>
 				{{ end }}
 				</ul>
 
 				<hr>
-				<h2>All tags</h2>
+				<h2>{{ t .Locale "full_page.header.all_tags" }}</h2>
 				<ul class="tags">
 				{{ $tree := .Tree }}
 				{{ range .Tree.Tags }}
-					<li><a href="{{ $page.PathToRoot }}/tag/{{ . }}.html">{{ . }} ({{ len ($tree.FilterByTag .) }})</a></li>
+					<li><a href="{{ $pathToRoot }}{{ $localePath }}/tag/{{ . }}.html">{{ . }} ({{ len ($tree.FilterByTag .) }})</a></li>
 				{{ end }}
 				</ul>
 
 				<hr>
-				<h2>Recent pages</h2>
+				<h2>{{ t .Locale "full_page.header.recent_pages" }}</h2>
 				<ul>
 				{{ range .Tree.RecentPages 5 }}	
-					<li><a href="{{ $page.PathToRoot }}{{ .Path }}">{{ .Title }}</a> ({{ .Date }})</li>
+					<li><a href="{{ $pathToRoot }}{{ $localePath }}{{ .Path }}">{{ .Title }}</a> ({{ .Date }})</li>
 				{{ end }}
 				</ul>
 				
 				<hr>
-				<h2>About</h2>
-				{{ .Siteinfo.DescriptionHelper .Page }}
+				<h2>{{ t .Locale "full_page.header.about" }}</h2>
+				{{ .Siteinfo.DescriptionHelper .Page $localePath }}
+				<hr>
+				<h2>{{ t .Locale "full_page.header.languages" }}</h2>
+				<ul>
+				{{ range $locale, $localePath := .Siteinfo.LocalePaths }}
+					<li><a href="{{ $pathToRoot }}{{ $localePath }}/index.html">{{ t $locale "locale_name" }}</a></li>
+				{{ end }}
+				</ul>
 			</aside>
 			<section>
 {{ end }}
 {{ define "Footer" }}
+{{ $localePath := index .Siteinfo.LocalePaths .Locale }}
+{{ $pathToRoot := .Page.PathToRoot $localePath }}
 			</section>
 		</main>
 		<footer>
 			{{ .Siteinfo.MainAuthorHelper }}
-			{{ .Siteinfo.CopyrightHelper .Page }}
+			{{ .Siteinfo.CopyrightHelper .Page .Locale }}
 			<p>
-				<a href="https://github.com/ribacq/tomato">Statically generated with Tomato</a>
+				<a href="https://github.com/ribacq/tomato">{{ t .Locale "full_page.footer.tomato" }}</a>
 			</p>
 			<p>
-				<a href="#top">Back to top</a>
+				<a href="#top">{{ t .Locale "full_page.footer.back_to_top" }}</a>
 			</p>
 		</footer>
 		<!-- load JS -->
-		<script type="text/javascript" src="{{ .Page.PathToRoot }}/assets/main.js"><p>Sorry, you do not have Javascript enabled.</p></script>
-		<script id="dsq-count-scr" src="//tomatogen.disqus.com/count.js" async></script>
+		<script type="text/javascript" src="{{ $pathToRoot }}/assets/main.js"><p>{{ t .Locale "full_page.footer.no_js" }}</p></script>
 	</body>
 </html>
 {{ end }}

@@ -1,7 +1,12 @@
+// Tomato static website generator
+// Copyright Quentin Ribac, 2018
+// Free software license can be found in the LICENSE file.
+
 package main
 
 import (
 	"fmt"
+	"path"
 	"regexp"
 	"strings"
 )
@@ -22,8 +27,8 @@ type Page struct {
 }
 
 // ContentHelper prints the page in html.
-func (page *Page) ContentHelper() string {
-	return strings.Replace(string(Html(page.Content, page)), "&quot;", "\"", -1)
+func (page *Page) ContentHelper(localePath string) string {
+	return strings.Replace(string(Html(page.Content, page, localePath)), "&quot;", "\"", -1)
 }
 
 // Excerpt returns an excerpt of the beginning of the page without any html formatting.
@@ -39,14 +44,14 @@ func (page Page) Excerpt() string {
 }
 
 // PathHelper prints the path from the root to the current page in html.
-func (page Page) PathHelper(curPage Page) string {
+func (page Page) PathHelper(curPage Page, localePath string) string {
 	var str string
 	if page.Basename != "index" {
-		str = fmt.Sprintf("<a href=\"%s%s\">%s</a>", curPage.PathToRoot(), page.Path(), page.Title)
+		str = fmt.Sprintf("<a href=\"%s%s\">%s</a>", curPage.PathToRoot(localePath), page.Path(), page.Title)
 	}
 	cat := page.Category
 	for cat != nil {
-		prefix := fmt.Sprintf("<a href=\"%s%sindex.html\">%s</a>", curPage.PathToRoot(), cat.Path(), cat.Name)
+		prefix := fmt.Sprintf("<a href=\"%s%sindex.html\">%s</a>", curPage.PathToRoot(localePath), cat.Path(), cat.Name)
 		if len(str) == 0 {
 			str = prefix
 		} else {
@@ -63,9 +68,9 @@ func (page *Page) Path() string {
 }
 
 // PathToRoot returns a series of '../' in a string to give a relative path from this page to the root of the website.
-func (page *Page) PathToRoot() string {
+func (page *Page) PathToRoot(localePath string) string {
 	str := "."
-	for i := 0; i < len(strings.Split(page.Path(), "/"))-2; i++ {
+	for i := 0; i < len(strings.Split(path.Join(localePath, page.Path()), "/"))-2; i++ {
 		str += "/.."
 	}
 	return str

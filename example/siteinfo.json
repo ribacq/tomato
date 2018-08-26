@@ -3,6 +3,10 @@
 	"subtitle": "Who doesn’t enjoy a tomato with lettuce?",
 	"description": "This website is a demonstration of the capacities of *tomato*.",
 	"copyright": "This website’s content is under [CC0](https://creativecommons.org/publicdomain/zero/1.0) license.",
+	"localePaths": {
+		"fr-FR": "/",
+		"en-US": "/en"
+	},
 	"authors": [
 		{
 			"name": "Quentin Ribac",

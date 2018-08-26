@@ -1,3 +1,7 @@
+// Tomato static website generator
+// Copyright Quentin Ribac, 2018
+// Free software license can be found in the LICENSE file.
+
 package main
 
 import (
@@ -10,11 +14,12 @@ import (
 // Copyright will be printed in the footer.
 // Authors must contain all possible authors for the website.
 type Siteinfo struct {
-	Title       string   `json: "title"`
-	Subtitle    string   `json: "subtitle"`
-	Description string   `json: "description"`
-	Copyright   string   `json: "copyright"`
-	Authors     []Author `json: "authors"`
+	Title       string            `json: "title"`
+	Subtitle    string            `json: "subtitle"`
+	Description string            `json: "description"`
+	Copyright   string            `json: "copyright"`
+	Authors     []Author          `json: "authors"`
+	LocalePaths map[string]string `json: "localePaths"`
 }
 
 // MainAuthorHelper prints a html link to the first author of the siteinfo.
@@ -23,18 +28,18 @@ func (siteinfo Siteinfo) MainAuthorHelper() string {
 }
 
 // CopyrightHelper prints html for the copyright information.
-func (siteinfo Siteinfo) CopyrightHelper(page *Page) string {
-	return string(Html([]byte(siteinfo.Copyright), page))
+func (siteinfo Siteinfo) CopyrightHelper(page *Page, locale string) string {
+	return string(Html([]byte(siteinfo.Copyright), page, siteinfo.LocalePaths[locale]))
 }
 
 // SubtitleHelper prints html for the site subtitle.
-func (siteinfo Siteinfo) SubtitleHelper(page *Page) string {
-	return string(Html([]byte(siteinfo.Subtitle), page))
+func (siteinfo Siteinfo) SubtitleHelper(page *Page, locale string) string {
+	return string(Html([]byte(siteinfo.Subtitle), page, siteinfo.LocalePaths[locale]))
 }
 
 // DescriptionHelper prints html for the site description.
-func (siteinfo Siteinfo) DescriptionHelper(page *Page) string {
-	return string(Html([]byte(siteinfo.Description), page))
+func (siteinfo Siteinfo) DescriptionHelper(page *Page, locale string) string {
+	return string(Html([]byte(siteinfo.Description), page, siteinfo.LocalePaths[locale]))
 }
 
 // FindAuthor returns an existing author by its name or nil and an error if there is no author with this name.

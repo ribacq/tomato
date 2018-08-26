@@ -1,25 +1,27 @@
 {{ define "PageList" }}
 {{ $page := .Page }}
 {{ $pages := .Page.Category.RecentPages -1 }}
+{{ $localePath := index .Siteinfo.LocalePaths .Locale }}
+{{ $pathToRoot := .Page.PathToRoot $localePath }}
 <div class="page-list">
 	{{ if len $pages }}
 		<div class="cards">
 			{{ range $pages }}
 				{{ if ne .Path $page.Path }}
 					<div class="card">
-						<h2 class="card-title" {{ if .PathToFeaturedImage }}style="background-image: url('{{ $page.PathToRoot }}{{ .PathToFeaturedImage }}')"{{ end }}><a href="{{ $page.PathToRoot }}{{ .Path }}">{{ .Title }}</a></h2>
+						<h2 class="card-title" {{ if .PathToFeaturedImage }}style="background-image: url('{{ $pathToRoot }}{{ .PathToFeaturedImage }}')"{{ end }}><a href="{{ $pathToRoot }}{{ $localePath }}{{ .Path }}">{{ .Title }}</a></h2>
 						<div class="card-content">
 							<p>
 								{{ .Excerpt }}
 								<br>
-								<a href="{{ $page.PathToRoot }}{{ .Path }}">Read more…</a>
+								<a href="{{ $pathToRoot }}{{ $localePath }}{{ .Path }}">Read more…</a>
 							</p>
-							{{ .PathHelper $page }}
+							{{ .PathHelper $page $localePath }}
 							<br>
 							{{ .Date }}
 							<ul class="tags">
 							{{ range .Tags }}
-								<li><a href="{{ $page.PathToRoot }}/tag/{{ . }}.html">{{ . }}</a></li>
+								<li><a href="{{ $pathToRoot }}{{ $localePath }}/tag/{{ . }}.html">{{ . }}</a></li>
 							{{ end }}
 							</ul>
 							{{ range .Authors }}{{ .Helper }}{{ end }}

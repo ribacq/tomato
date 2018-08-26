@@ -99,6 +99,16 @@ func main() {
 		fmt.Fprintln(os.Stderr, "Error: no /siteinfo.json found")
 		os.Exit(1)
 	}
+	// create directories from .LocalePaths
+	for locale := range siteinfo.LocalePaths {
+		if !DirectoryExists(path.Join(outputDir, siteinfo.LocalePaths[locale])) {
+			err := os.Mkdir(path.Join(outputDir, siteinfo.LocalePaths[locale]), 0775)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				os.Exit(1)
+			}
+		}
+	}
 	fmt.Printf("Done, %v authors found.\n", len(siteinfo.Authors))
 
 	// read category files (all catinfo.json)
@@ -222,153 +232,43 @@ func main() {
 	}
 	fmt.Printf("%v pages found\n", tree.PageCount())
 
+	// load locales
+	locales := LoadLocales(inputDir + "/templates/locales")
+
 	// load templates
-	templates := template.Must(template.ParseGlob(inputDir + "/templates/*.html"))
-
-	// walk tree
-	fmt.Println("\n\x1b[1mGenerating html...\x1b[0m")
-	for catQueue := []*Category{tree}; len(catQueue) > 0; catQueue = append(catQueue[1:], catQueue[0].SubCategories...) {
-		// create subdirectories
-		for _, subCat := range catQueue[0].SubCategories {
-			if !DirectoryExists(outputDir + subCat.Path()) {
-				err := os.Mkdir(outputDir+subCat.Path(), 0755)
-				if err != nil {
-					fmt.Fprintln(os.Stderr, err)
-					os.Exit(1)
-				}
-			}
-		}
-
-		// create page files
-		for _, page := range catQueue[0].Pages {
-			pageFile, err := os.OpenFile(outputDir+page.Path(), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0664)
-			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				os.Exit(1)
-			}
-
-			arg := map[string]interface{}{
-				"Siteinfo": siteinfo,
-				"Page":     page,
-				"Tree":     tree,
-			}
-			err = templates.ExecuteTemplate(pageFile, "Header", arg)
-			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				os.Exit(1)
-			}
-			templates = template.Must(templates.Parse("{{ define \"Content\" }}" + page.ContentHelper() + "{{ end }}"))
-			err = templates.ExecuteTemplate(pageFile, "Content", arg)
-			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				os.Exit(1)
-			}
-			template.Must(templates.Parse("{{ define \"Content\" }}{{ end }}"))
-			err = templates.ExecuteTemplate(pageFile, "Footer", arg)
-			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				os.Exit(1)
-			}
-
-			fmt.Println(page.Path())
-		}
+	templates := template.New("tomatoTemplates")
+	templates.Funcs(map[string]interface{}{
+		"t": func(locale, key string, args ...interface{}) string {
+			return string(locales.T(locale, key, args...))
+		},
+	})
+	_, err = templates.ParseGlob(inputDir + "/templates/*.html")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Error when parsing templates: ", err)
+		os.Exit(1)
 	}
 
-	// make categories index.html files with catinfo.json if there is no index.html yet
-	fmt.Println("\n\x1b[1mGenerating index.html files for categories lacking them...\x1b[0m")
-	for catQueue := []*Category{tree}; len(catQueue) > 0; catQueue = append(catQueue[1:], catQueue[0].SubCategories...) {
-		// if there is already an index.md: do nothing
-		mustContinue := false
-		for _, page := range catQueue[0].Pages {
-			if page.Basename == "index" {
-				mustContinue = true
-				break
-			}
-		}
-		if mustContinue {
-			continue
-		}
-
-		catFile, err := os.OpenFile(outputDir+catQueue[0].Path()+"index.html", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0664)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
+	// for each locale
+	for locale := range siteinfo.LocalePaths {
+		fmt.Println("\n\x1b[1mLocale: " + locale + ", in " + siteinfo.LocalePaths[locale] + "\x1b[0m")
+		// generate individual html pages
+		fmt.Println("Generating html files for individual pages...")
+		if err = GenerateIndividualPages(siteinfo, tree, templates, inputDir, outputDir, locale); err != nil {
+			fmt.Fprintln(os.Stderr, "Error:", err)
 			os.Exit(1)
 		}
 
-		arg := map[string]interface{}{
-			"Siteinfo": siteinfo,
-			"Page": &Page{
-				Category: catQueue[0],
-				Basename: "index",
-				Title:    "Category : " + catQueue[0].Name,
-				Authors:  []*Author{&siteinfo.Authors[0]},
-				Tags:     catQueue[0].Tags(),
-			},
-			"Tree": tree,
-		}
-		err = templates.ExecuteTemplate(catFile, "Header", arg)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-		err = templates.ExecuteTemplate(catFile, "PageList", arg)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-		err = templates.ExecuteTemplate(catFile, "Footer", arg)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
+		// make categories index.html files with catinfo.json if there is no index.html yet
+		fmt.Println("Generating index.html files for categories lacking them...")
+		if err = GenerateCategoryPages(siteinfo, tree, templates, inputDir, outputDir, locale); err != nil {
+			fmt.Fprintln(os.Stderr, "Error:", err)
 			os.Exit(1)
 		}
 
-		fmt.Println(catQueue[0].Path() + "index.html")
-	}
-
-	// make tags html files
-	if !DirectoryExists(outputDir + "/tag") {
-		err := os.Mkdir(outputDir+"/tag", 0755)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-	}
-	for _, tag := range tree.Tags() {
-		tagFile, err := os.OpenFile(outputDir+"/tag/"+tag+".html", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0664)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-		arg := map[string]interface{}{
-			"Siteinfo": siteinfo,
-			"Page": &Page{
-				Category: &Category{
-					Parent:      tree,
-					Basename:    "tag",
-					Name:        "Tags",
-					Description: "Pages tagged with " + tag,
-					Pages:       tree.FilterByTags([]string{tag}),
-				},
-				Basename: tag,
-				Title:    "Tag: " + tag,
-				Authors:  []*Author{&siteinfo.Authors[0]},
-				Tags:     []string{tag},
-			},
-			"Tree": tree,
-		}
-		err = templates.ExecuteTemplate(tagFile, "Header", arg)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-		err = templates.ExecuteTemplate(tagFile, "PageList", arg)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-		err = templates.ExecuteTemplate(tagFile, "Footer", arg)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
+		// make tags html files
+		fmt.Println("Generating html files for tags...")
+		if err = GenerateTagPages(siteinfo, tree, templates, inputDir, outputDir, locale); err != nil {
+			fmt.Fprintln(os.Stderr, "Error:", err)
 			os.Exit(1)
 		}
 	}

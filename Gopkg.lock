@@ -2,10 +2,116 @@
 
 
 [[projects]]
+  name = "github.com/jinzhu/gorm"
+  packages = ["."]
+  revision = "6ed508ec6a4ecb3531899a69cbc746ccf65a4166"
+  version = "v1.9.1"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/jinzhu/inflection"
+  packages = ["."]
+  revision = "04140366298a54a039076d798123ffa108fff46c"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/jinzhu/now"
+  packages = ["."]
+  revision = "ed742868f2aebdb1c0c437bf4f7257f88834b66f"
+
+[[projects]]
+  name = "github.com/kr/pretty"
+  packages = ["."]
+  revision = "73f6ac0b30a98e433b289500d779f50c1a6f0712"
+  version = "v0.1.0"
+
+[[projects]]
+  name = "github.com/kr/text"
+  packages = ["."]
+  revision = "e2ffdb16a802fe2bb95e2e35ff34f0e53aeef34f"
+  version = "v0.1.0"
+
+[[projects]]
+  name = "github.com/microcosm-cc/bluemonday"
+  packages = ["."]
+  revision = "82c7118e8ccf7403d4860175d97bb635e8e28239"
+  version = "v1.0.1"
+
+[[projects]]
+  name = "github.com/qor/admin"
+  packages = ["."]
+  revision = "a5c271dab2795bb9d7f855194ec0408355120e69"
+  version = "v1.0"
+
+[[projects]]
+  name = "github.com/qor/cache"
+  packages = [
+    ".",
+    "memory"
+  ]
+  revision = "e04154acb5d9d88cb9c33a72f1e9bad72059ae9c"
+  version = "v1.0"
+
+[[projects]]
+  name = "github.com/qor/i18n"
+  packages = [
+    ".",
+    "backends/yaml"
+  ]
+  revision = "f65b849b92f215805e777a5e6524ca7859fbae32"
+  version = "v1.0"
+
+[[projects]]
+  name = "github.com/qor/qor"
+  packages = [
+    ".",
+    "resource",
+    "utils"
+  ]
+  revision = "d1402d1caffb8f9c05d73fa5bfaae2853c4191fb"
+  version = "v1.0"
+
+[[projects]]
+  name = "github.com/qor/responder"
+  packages = ["."]
+  revision = "ecae0be66c1a6a441001b0b5eeef51f8bc27d42a"
+  version = "v1.0"
+
+[[projects]]
+  name = "github.com/qor/roles"
+  packages = ["."]
+  revision = "f1e05694734518c0ce2dc21151e0ecfccf4db8f4"
+  version = "v1.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/shurcooL/sanitized_anchor_name"
   packages = ["."]
   revision = "86672fcb3f950f35f2e675df2240550f2a50762f"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/theplant/cldr"
+  packages = ["."]
+  revision = "b97a4c2a76cf8ba21d1cb8ed2f4c8ee103371e2d"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/net"
+  packages = [
+    "html",
+    "html/atom"
+  ]
+  revision = "4bcd98cce591d8c7061bf313d7a3cbad05b58549"
+
+[[projects]]
+  name = "golang.org/x/text"
+  packages = [
+    "internal/gen",
+    "unicode/cldr"
+  ]
+  revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
+  version = "v0.3.0"
 
 [[projects]]
   name = "gopkg.in/russross/blackfriday.v2"
@@ -13,9 +119,15 @@
   revision = "cadec560ec52d93835bf2f15bd794700d3a2473b"
   version = "v2.0.0"
 
+[[projects]]
+  name = "gopkg.in/yaml.v2"
+  packages = ["."]
+  revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
+  version = "v2.2.1"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "53d55b43a471e52fe1713412b202df90ab9cf2b42bd0ae4cc2e8abe85e014755"
+  inputs-digest = "dd09ce755aee96aad9b06346f6a7d776d9f96bf7b31727f9db2ea7a33fd29597"
   solver-name = "gps-cdcl"
   solver-version = 1

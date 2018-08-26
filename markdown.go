@@ -1,3 +1,7 @@
+// Tomato static website generator
+// Copyright Quentin Ribac, 2018
+// Free software license can be found in the LICENSE file.
+
 package main
 
 import (
@@ -11,9 +15,9 @@ const (
 )
 
 // Html wraps the blackfriday markdown converter. It takes and returns a slice of bytes.
-func Html(content []byte, page *Page) []byte {
+func Html(content []byte, page *Page, localePath string) []byte {
 	renderer := blackfriday.NewHTMLRenderer(blackfriday.HTMLRendererParameters{
-		AbsolutePrefix: page.PathToRoot(),
+		AbsolutePrefix: page.PathToRoot(localePath),
 		Flags:          blackfriday.FootnoteReturnLinks,
 		FootnoteReturnLinkContents: "<sup>&uarr;</sup>",
 	})
