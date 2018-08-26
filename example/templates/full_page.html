@@ -65,8 +65,9 @@
 				<hr>
 				<h2>{{ t .Locale "full_page.header.languages" }}</h2>
 				<ul>
+				{{ $page := .Page }}
 				{{ range $locale, $localePath := .Siteinfo.LocalePaths }}
-					<li><a href="{{ $pathToRoot }}{{ $localePath }}/index.html">{{ t $locale "locale_name" }}</a></li>
+					<li><a href="{{ $pathToRoot }}{{ $localePath }}{{ $page.Path }}">{{ t $locale "locale_name" }}</a></li>
 				{{ end }}
 				</ul>
 			</aside>
