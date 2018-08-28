@@ -43,7 +43,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println("Using " + inputDir)
+	fmt.Println("Input: " + inputDir)
 
 	// set and maybe create output directory
 	if len(os.Args) > 2 && os.Args[2] != inputDir {
@@ -55,6 +55,9 @@ func main() {
 		fmt.Fprintln(os.Stderr, "Error: "+outputDir+" already exists and is not a directory.")
 		os.Exit(1)
 	}
+
+	fmt.Println("Output: " + outputDir)
+
 	if DirectoryExists(outputDir) {
 		fmt.Println("Deleting pre-existing output directory")
 		rmOutput := exec.Command("rm", "-rf", outputDir)
@@ -74,11 +77,6 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-
-	fmt.Println("Output will be written to " + outputDir)
-
-	// initialize empty tree
-	tree := &Category{}
 
 	// load /siteinfo.json
 	fmt.Println("\n\x1b[1mLoading /siteinfo.json...\x1b[0m")
@@ -100,28 +98,34 @@ func main() {
 		os.Exit(1)
 	}
 	// create directories from .LocalePaths
-	for locale := range siteinfo.LocalePaths {
-		if !DirectoryExists(path.Join(outputDir, siteinfo.LocalePaths[locale])) {
-			err := os.Mkdir(path.Join(outputDir, siteinfo.LocalePaths[locale]), 0775)
+	for _, localePath := range siteinfo.LocalePaths {
+		if !DirectoryExists(path.Join(outputDir, localePath)) {
+			err := os.Mkdir(path.Join(outputDir, localePath), 0775)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
 			}
 		}
 	}
-	fmt.Printf("Done, %v authors found.\n", len(siteinfo.Authors))
+	fmt.Printf("Done, %v locales, %v authors found.\n", len(siteinfo.LocalePaths), len(siteinfo.Authors))
+
+	// initialize empty tree
+	tree := NewCategory(siteinfo)
 
 	// read category files (all catinfo.json)
 	fmt.Println("\n\x1b[1mLoading categories...\x1b[0m")
 	err = WalkDir(inputDir, func(fpath string) error {
 		if path.Base(fpath) == "catinfo.json" {
-			fmt.Println(fpath)
+			// open file
+			// fmt.Println(fpath)
 			f, err := os.Open(fpath)
 			if err != nil {
 				return err
 			}
+
+			// load json
+			cat := NewCategory(siteinfo)
 			jsonDecoder := json.NewDecoder(f)
-			var cat Category
 			err = jsonDecoder.Decode(&cat)
 			if err != nil {
 				return err
@@ -140,7 +144,7 @@ func main() {
 				tree.Description = cat.Description
 				tree.Basename = cat.Basename
 			} else {
-				parent.SubCategories = append(parent.SubCategories, &cat)
+				parent.SubCategories = append(parent.SubCategories, cat)
 				cat.Parent = parent
 			}
 		}
@@ -156,6 +160,21 @@ func main() {
 	fmt.Println("\n\x1b[1mLoading pages...\x1b[0m")
 	err = WalkDir(inputDir, func(fpath string) error {
 		if strings.HasSuffix(path.Base(fpath), ".md") {
+			// detect locale, fallback to roott locale defined in siteinfo.json
+			var locale string
+			for localeCandidate := range siteinfo.LocalePaths {
+				if siteinfo.LocalePaths[localeCandidate] == "/" {
+					locale = localeCandidate
+				}
+				if strings.HasSuffix(path.Base(fpath), "."+localeCandidate+".md") {
+					locale = localeCandidate
+					break
+				}
+			}
+			if locale == "" {
+				return fmt.Errorf("Unable to detect locale for %v", fpath)
+			}
+
 			// load file content
 			content, err := ReadFile(fpath)
 			if err != nil {
@@ -203,7 +222,7 @@ func main() {
 				}
 				authors = append(authors, author)
 			}
-			page := &Page{nil, strings.TrimSuffix(path.Base(fpath), ".md"), title, authors, date, tags, draft, content, pathToFeaturedImage}
+			page := &Page{nil, strings.TrimSuffix(strings.TrimSuffix(path.Base(fpath), ".md"), "."+locale), title, authors, date, tags, draft, content, pathToFeaturedImage, locale}
 
 			if page.Draft {
 				fmt.Printf("Skipping draft: ‘%s’\n", page.Title)
@@ -215,14 +234,14 @@ func main() {
 				return err
 			}
 			if parent == nil {
-				tree.Pages = append(tree.Pages, page)
+				tree.Pages[locale] = append(tree.Pages[locale], page)
 				page.Category = tree
 			} else {
-				parent.Pages = append(parent.Pages, page)
+				parent.Pages[locale] = append(parent.Pages[locale], page)
 				page.Category = parent
 			}
 
-			fmt.Println(fpath)
+			// fmt.Println(locale, fpath)
 		}
 		return nil
 	})
@@ -230,7 +249,9 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	fmt.Printf("%v pages found\n", tree.PageCount())
+	for locale := range siteinfo.LocalePaths {
+		fmt.Printf("%v: %v pages found\n", locale, tree.PageCount(locale))
+	}
 
 	// load locales
 	locales := LoadLocales(inputDir + "/templates/locales")
@@ -256,21 +277,21 @@ func main() {
 		fmt.Println("\n\x1b[1mLocale: " + locale + ", in " + siteinfo.LocalePaths[locale] + "\x1b[0m")
 		// generate individual html pages
 		fmt.Println("Generating html files for individual pages...")
-		if err = GenerateIndividualPages(siteinfo, tree, templates, inputDir, outputDir, locale); err != nil {
+		if err = GenerateIndividualPages(siteinfo, tree, templates, inputDir, outputDir, locales, locale); err != nil {
 			fmt.Fprintln(os.Stderr, "Error:", err)
 			os.Exit(1)
 		}
 
 		// make categories index.html files with catinfo.json if there is no index.html yet
 		fmt.Println("Generating index.html files for categories lacking them...")
-		if err = GenerateCategoryPages(siteinfo, tree, templates, inputDir, outputDir, locale); err != nil {
+		if err = GenerateCategoryPages(siteinfo, tree, templates, inputDir, outputDir, locales, locale); err != nil {
 			fmt.Fprintln(os.Stderr, "Error:", err)
 			os.Exit(1)
 		}
 
 		// make tags html files
 		fmt.Println("Generating html files for tags...")
-		if err = GenerateTagPages(siteinfo, tree, templates, inputDir, outputDir, locale); err != nil {
+		if err = GenerateTagPages(siteinfo, tree, templates, inputDir, outputDir, locales, locale); err != nil {
 			fmt.Fprintln(os.Stderr, "Error:", err)
 			os.Exit(1)
 		}

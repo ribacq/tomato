@@ -24,6 +24,7 @@ type Page struct {
 	Draft               bool
 	Content             []byte
 	PathToFeaturedImage string
+	Locale              string
 }
 
 // ContentHelper prints the page in html.
@@ -65,6 +66,27 @@ func (page Page) PathHelper(curPage Page, localePath string) string {
 // Path returns the slash-seperated path for the page, starting from the root.
 func (page *Page) Path() string {
 	return page.Category.Path() + page.Basename + ".html"
+}
+
+// Exists in locale
+func (page *Page) ExistsInLocale(locale string) bool {
+	// if locale doesn’t exist, return false
+	if _, ok := page.Category.Pages[locale]; !ok {
+		return false
+	}
+
+	// category pages exist in all existing locales
+	if page.Basename == "index" {
+		return true
+	}
+
+	// look for page in other locales
+	for _, curPage := range page.Category.Pages[locale] {
+		if curPage.Basename == page.Basename {
+			return true
+		}
+	}
+	return false
 }
 
 // PathToRoot returns a series of '../' in a string to give a relative path from this page to the root of the website.

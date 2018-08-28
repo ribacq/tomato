@@ -16,10 +16,10 @@
 			<div id="subtitle">{{ .Siteinfo.SubtitleHelper .Page .Locale }}</div>
 		</header>
 		<nav>
-			<div class="flowing-menu">{{ .Tree.NavHelper .Page true $localePath }}</div>
+			<div class="flowing-menu">{{ .Tree.NavHelper .Page true .Locale $localePath }}</div>
 			<ul>
 				<li><a {{ if eq .Page.Path "/index.html" }}class="active"{{ end }} href="{{ $pathToLocale }}{{ .Tree.Path }}index.html">{{ .Tree.Name }}</a></li>
-				{{ range .Tree.Pages }}
+				{{ range (index .Tree.Pages .Locale) }}
 					{{ if ne .Basename "index" }}
 						<li><a {{ if eq $page.Path .Path }}class="active"{{ end }} href="{{ $pathToLocale }}{{ .Path }}">{{ .Title }}</a></li>
 					{{ end }}
@@ -47,15 +47,16 @@
 				<h2>{{ t .Locale "full_page.header.all_tags" }}</h2>
 				<ul class="tags">
 				{{ $tree := .Tree }}
-				{{ range .Tree.Tags }}
-					<li><a href="{{ $pathToLocale }}/tag/{{ . }}.html">{{ . }} ({{ len ($tree.FilterByTag .) }})</a></li>
+				{{ $locale := .Locale }}
+				{{ range (.Tree.Tags .Locale) }}
+					<li><a href="{{ $pathToLocale }}/tag/{{ . }}.html">{{ . }} ({{ len ($tree.FilterByTag . $locale) }})</a></li>
 				{{ end }}
 				</ul>
 
 				<hr>
 				<h2>{{ t .Locale "full_page.header.recent_pages" }}</h2>
 				<ul>
-				{{ range .Tree.RecentPages 5 }}	
+				{{ range (.Tree.RecentPages 5 .Locale) }}	
 					<li><a href="{{ $pathToLocale }}{{ .Path }}">{{ .Title }}</a> ({{ .Date }})</li>
 				{{ end }}
 				</ul>
@@ -68,7 +69,9 @@
 				<ul>
 				{{ $page := .Page }}
 				{{ range $locale, $localePath := .Siteinfo.LocalePaths }}
-					<li><a href="{{ join $pathToRoot $localePath }}{{ $page.Path }}"><img src="{{ $pathToRoot }}/media/img/flag_{{ $locale }}.png" alt="flag_{{ $locale }}">&nbsp;{{ t $locale "locale_name" }}</a></li>
+					{{ if ($page.ExistsInLocale $locale) }}
+						<li><a href="{{ join $pathToRoot $localePath $page.Path }}"><img src="{{ $pathToRoot }}/media/img/flag_{{ $locale }}.png" alt="flag_{{ $locale }}">&nbsp;{{ t $locale "locale_name" }}</a></li>
+					{{ end }}
 				{{ end }}
 				</ul>
 			</aside>
@@ -80,7 +83,9 @@
 			</section>
 		</main>
 		<footer>
-			{{ .Siteinfo.MainAuthorHelper }}
+			{{ range .Siteinfo.Authors }}
+				{{ .Helper }}
+			{{ end }}
 			{{ .Siteinfo.CopyrightHelper .Page .Locale }}
 			<p>
 				<a href="https://github.com/ribacq/tomato">{{ t .Locale "full_page.footer.tomato" }}</a>

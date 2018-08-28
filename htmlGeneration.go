@@ -8,10 +8,12 @@ import (
 	"os"
 	"path"
 	"text/template"
+
+	"github.com/qor/i18n"
 )
 
 // GenerateIndividualPages creates HTML files and calls the templates for each page defined in the website
-func GenerateIndividualPages(siteinfo Siteinfo, tree *Category, templates *template.Template, inputDir, outputDir, locale string) error {
+func GenerateIndividualPages(siteinfo Siteinfo, tree *Category, templates *template.Template, inputDir, outputDir string, locales *i18n.I18n, locale string) error {
 	for catQueue := []*Category{tree}; len(catQueue) > 0; catQueue = append(catQueue[1:], catQueue[0].SubCategories...) {
 		// create subdirectories
 		for _, subCat := range catQueue[0].SubCategories {
@@ -24,7 +26,7 @@ func GenerateIndividualPages(siteinfo Siteinfo, tree *Category, templates *templ
 		}
 
 		// create page files
-		for _, page := range catQueue[0].Pages {
+		for _, page := range catQueue[0].Pages[locale] {
 			pageFile, err := os.OpenFile(path.Join(outputDir, siteinfo.LocalePaths[locale], page.Path()), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0664)
 			if err != nil {
 				return err
@@ -59,11 +61,11 @@ func GenerateIndividualPages(siteinfo Siteinfo, tree *Category, templates *templ
 }
 
 // GenerateCategoryPages creates index.html files for categories lacking them
-func GenerateCategoryPages(siteinfo Siteinfo, tree *Category, templates *template.Template, inputDir, outputDir, locale string) error {
+func GenerateCategoryPages(siteinfo Siteinfo, tree *Category, templates *template.Template, inputDir, outputDir string, locales *i18n.I18n, locale string) error {
 	for catQueue := []*Category{tree}; len(catQueue) > 0; catQueue = append(catQueue[1:], catQueue[0].SubCategories...) {
 		// if there is already an index.md: do nothing
 		mustContinue := false
-		for _, page := range catQueue[0].Pages {
+		for _, page := range catQueue[0].Pages[locale] {
 			if page.Basename == "index" {
 				mustContinue = true
 				break
@@ -86,9 +88,9 @@ func GenerateCategoryPages(siteinfo Siteinfo, tree *Category, templates *templat
 			"Page": &Page{
 				Category: catQueue[0],
 				Basename: "index",
-				Title:    "Category : " + catQueue[0].Name,
+				Title:    string(locales.T(locale, "categories.page_list_name", catQueue[0].Name)),
 				Authors:  []*Author{&siteinfo.Authors[0]},
-				Tags:     catQueue[0].Tags(),
+				Tags:     catQueue[0].Tags(locale),
 			},
 			"Tree": tree,
 		}
@@ -114,7 +116,7 @@ func GenerateCategoryPages(siteinfo Siteinfo, tree *Category, templates *templat
 }
 
 // GenerateTagPages create a ‘tag’ directory and tag pages in it.
-func GenerateTagPages(siteinfo Siteinfo, tree *Category, templates *template.Template, inputDir, outputDir, locale string) error {
+func GenerateTagPages(siteinfo Siteinfo, tree *Category, templates *template.Template, inputDir, outputDir string, locales *i18n.I18n, locale string) error {
 	// create tag directory
 	tagDir := path.Join(outputDir, siteinfo.LocalePaths[locale], "tag")
 	if !DirectoryExists(tagDir) {
@@ -123,7 +125,7 @@ func GenerateTagPages(siteinfo Siteinfo, tree *Category, templates *template.Tem
 			return err
 		}
 	}
-	for _, tag := range tree.Tags() {
+	for _, tag := range tree.Tags(locale) {
 		// create tag file
 		tagFile, err := os.OpenFile(path.Join(tagDir, tag+".html"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0664)
 		if err != nil {
@@ -139,8 +141,8 @@ func GenerateTagPages(siteinfo Siteinfo, tree *Category, templates *template.Tem
 					Parent:      tree,
 					Basename:    "tag",
 					Name:        "Tags",
-					Description: "Pages tagged with " + tag,
-					Pages:       tree.FilterByTags([]string{tag}),
+					Description: string(locales.T(locale, "tags.page_list_name", tag)),
+					Pages:       map[string][]*Page{locale: tree.FilterByTags([]string{tag}, locale)},
 				},
 				Basename: tag,
 				Title:    "Tag: " + tag,
@@ -163,6 +165,8 @@ func GenerateTagPages(siteinfo Siteinfo, tree *Category, templates *template.Tem
 		if err != nil {
 			return err
 		}
+
+		// fmt.Println(path.Join(tagDir, tag+".html"))
 	}
 
 	return nil

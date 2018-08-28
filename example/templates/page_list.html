@@ -1,6 +1,6 @@
 {{ define "PageList" }}
 {{ $page := .Page }}
-{{ $pages := .Page.Category.RecentPages -1 }}
+{{ $pages := .Page.Category.RecentPages -1 .Locale }}
 {{ $localePath := index .Siteinfo.LocalePaths .Locale }}
 {{ $pathToRoot := .Page.PathToRoot $localePath }}
 <div class="page-list">

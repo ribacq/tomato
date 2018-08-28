@@ -11,3 +11,7 @@ en:
             tomato: Statically generated with Tomato
             back_to_top: Back to top
             no_js: Sorry, you do not seem to have enabled JavaScript.
+    categories:
+        page_list_name: "Category: {{$1}}"
+    tags:
+        page_list_name: "Tag: {{$1}}"
