@@ -241,6 +241,9 @@ func main() {
 		"t": func(locale, key string, args ...interface{}) string {
 			return string(locales.T(locale, key, args...))
 		},
+		"join": func(paths ...string) string {
+			return path.Clean(path.Join(paths...))
+		},
 	})
 	_, err = templates.ParseGlob(inputDir + "/templates/*.html")
 	if err != nil {

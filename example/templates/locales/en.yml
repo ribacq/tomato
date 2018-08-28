@@ -6,7 +6,7 @@ en:
             all_tags: All tags
             recent_pages: Recent pages
             about: About
-            languages: Languages
+            languages: Available languages
         footer:
             tomato: Statically generated with Tomato
             back_to_top: Back to top
