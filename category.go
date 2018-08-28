@@ -38,14 +38,14 @@ func NewCategory(siteinfo Siteinfo) *Category {
 
 // mdTree returns the tree of all pages in markdown format
 func (cat *Category) mdTree(prefix string, showPages bool, locale, localePath string) []byte {
-	str := fmt.Sprintf("%s* [%s >](%s/index.html)\n", prefix, cat.Name, path.Join(localePath, cat.Path()))
+	str := fmt.Sprintf("%s* [%s >](%s)\n", prefix, cat.Name, path.Clean(path.Join(localePath, cat.Path(), "index.html")))
 	for _, subCat := range cat.SubCategories {
 		str += string(subCat.mdTree("\t"+prefix, showPages, locale, localePath))
 	}
 	if showPages {
 		for _, page := range cat.Pages[locale] {
 			if page.Basename != "index" {
-				str += fmt.Sprintf("%s\t* [%s](%s)\n", prefix, page.Title, path.Join(localePath, page.Path()))
+				str += fmt.Sprintf("%s\t* [%s](%s)\n", prefix, page.Title, path.Clean(path.Join(localePath, page.Path())))
 			}
 		}
 	}

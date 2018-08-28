@@ -9,19 +9,19 @@
 			{{ range $pages }}
 				{{ if ne .Path $page.Path }}
 					<div class="card">
-						<h2 class="card-title" {{ if .PathToFeaturedImage }}style="background-image: url('{{ $pathToRoot }}{{ .PathToFeaturedImage }}')"{{ end }}><a href="{{ $pathToRoot }}{{ $localePath }}{{ .Path }}">{{ .Title }}</a></h2>
+						<h2 class="card-title" {{ if .PathToFeaturedImage }}style="background-image: url('{{ join $pathToRoot .PathToFeaturedImage }}')"{{ end }}><a href="{{ join $pathToRoot $localePath .Path }}">{{ .Title }}</a></h2>
 						<div class="card-content">
 							<p>
 								{{ .Excerpt }}
 								<br>
-								<a href="{{ $pathToRoot }}{{ $localePath }}{{ .Path }}">Read more…</a>
+								<a href="{{ join $pathToRoot $localePath .Path }}">Read more…</a>
 							</p>
 							{{ .PathHelper $page $localePath }}
 							<br>
 							{{ .Date }}
 							<ul class="tags">
 							{{ range .Tags }}
-								<li><a href="{{ $pathToRoot }}{{ $localePath }}/tag/{{ . }}.html">{{ . }}</a></li>
+								<li><a href="{{ join $pathToRoot $localePath "/tag/{{ . }}.html" }}">{{ . }}</a></li>
 							{{ end }}
 							</ul>
 							{{ range .Authors }}{{ .Helper }}{{ end }}

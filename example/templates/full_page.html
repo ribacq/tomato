@@ -8,24 +8,24 @@
 	<head>
 		<meta charset="utf-8">
 		<title>{{ .Page.Title }} — {{ .Siteinfo.Title }}</title>
-		<link rel="stylesheet" type="text/css" href="{{ $pathToRoot }}/assets/style.css">
+		<link rel="stylesheet" type="text/css" href="{{ join $pathToRoot "/assets/style.css" }}">
 	</head>
 	<body>
-		<header {{ if .Page.PathToFeaturedImage }}style="background-image: url('{{ $pathToRoot }}{{ .Page.PathToFeaturedImage }}')"{{ end }}>
-			<h1><a href="{{ $pathToLocale }}/index.html" id="top">{{ .Siteinfo.Title }}</a></h1>
+		<header {{ if .Page.PathToFeaturedImage }}style="background-image: url('{{ join $pathToRoot .Page.PathToFeaturedImage }}')"{{ end }}>
+			<h1><a href="{{ join $pathToLocale "index.html" }}" id="top">{{ .Siteinfo.Title }}</a></h1>
 			<div id="subtitle">{{ .Siteinfo.SubtitleHelper .Page .Locale }}</div>
 		</header>
 		<nav>
 			<div class="flowing-menu">{{ .Tree.NavHelper .Page true .Locale $localePath }}</div>
 			<ul>
-				<li><a {{ if eq .Page.Path "/index.html" }}class="active"{{ end }} href="{{ $pathToLocale }}{{ .Tree.Path }}index.html">{{ .Tree.Name }}</a></li>
+				<li><a {{ if eq .Page.Path "/index.html" }}class="active"{{ end }} href="{{ join $pathToLocale .Tree.Path "index.html" }}">{{ .Tree.Name }}</a></li>
 				{{ range (index .Tree.Pages .Locale) }}
 					{{ if ne .Basename "index" }}
-						<li><a {{ if eq $page.Path .Path }}class="active"{{ end }} href="{{ $pathToLocale }}{{ .Path }}">{{ .Title }}</a></li>
+						<li><a {{ if eq $page.Path .Path }}class="active"{{ end }} href="{{ join $pathToLocale .Path }}">{{ .Title }}</a></li>
 					{{ end }}
 				{{ end }}
 				{{ range .Tree.SubCategories }}
-					<li><a {{ if eq $page.Category.Path .Path }}class="active"{{ end }} href="{{ $pathToLocale }}{{ .Path }}index.html">{{ .Name }}</a></li>
+					<li><a {{ if eq $page.Category.Path .Path }}class="active"{{ end }} href="{{ join $pathToLocale .Path "index.html" }}">{{ .Name }}</a></li>
 				{{ end }}
 			</ul>
 		</nav>
@@ -39,7 +39,7 @@
 				<time>{{ .Page.Date }}</time>
 				<ul class="tags">
 				{{ range .Page.Tags }}
-					<li><a href="{{ $pathToLocale }}/tag/{{ . }}.html">{{ . }}</a></li>
+					<li><a href="{{ join $pathToLocale "/tag" }}/{{ . }}.html">{{ . }}</a></li>
 				{{ end }}
 				</ul>
 
@@ -49,7 +49,7 @@
 				{{ $tree := .Tree }}
 				{{ $locale := .Locale }}
 				{{ range (.Tree.Tags .Locale) }}
-					<li><a href="{{ $pathToLocale }}/tag/{{ . }}.html">{{ . }} ({{ len ($tree.FilterByTag . $locale) }})</a></li>
+					<li><a href="{{ join $pathToLocale "/tag"}}/{{ . }}.html">{{ . }} ({{ len ($tree.FilterByTag . $locale) }})</a></li>
 				{{ end }}
 				</ul>
 
@@ -57,7 +57,7 @@
 				<h2>{{ t .Locale "full_page.header.recent_pages" }}</h2>
 				<ul>
 				{{ range (.Tree.RecentPages 5 .Locale) }}	
-					<li><a href="{{ $pathToLocale }}{{ .Path }}">{{ .Title }}</a> ({{ .Date }})</li>
+					<li><a href="{{ join $pathToLocale .Path }}">{{ .Title }}</a> ({{ .Date }})</li>
 				{{ end }}
 				</ul>
 				
@@ -69,8 +69,8 @@
 				<ul>
 				{{ $page := .Page }}
 				{{ range $locale, $localePath := .Siteinfo.LocalePaths }}
-					{{ if ($page.ExistsInLocale $locale) }}
-						<li><a href="{{ join $pathToRoot $localePath $page.Path }}"><img src="{{ $pathToRoot }}/media/img/flag_{{ $locale }}.png" alt="flag_{{ $locale }}">&nbsp;{{ t $locale "locale_name" }}</a></li>
+					{{ if $page.ExistsInLocale $locale }}
+						<li><a href="{{ join $pathToRoot $localePath $page.Path }}"><img src="{{ join $pathToRoot "/media/img" }}/flag_{{ $locale }}.png" alt="flag_{{ $locale }}">&nbsp;{{ t $locale "locale_name" }}</a></li>
 					{{ end }}
 				{{ end }}
 				</ul>
@@ -95,7 +95,7 @@
 			</p>
 		</footer>
 		<!-- load JS -->
-		<script type="text/javascript" src="{{ $pathToRoot }}/assets/main.js"><p>{{ t .Locale "full_page.footer.no_js" }}</p></script>
+		<script type="text/javascript" src="{{ join $pathToRoot "/assets/main.js" }}"><p>{{ t .Locale "full_page.footer.no_js" }}</p></script>
 	</body>
 </html>
 {{ end }}
