@@ -70,7 +70,7 @@ en:
     full_page:
         header:
             page: Page
-			all_tags: All tags
+            all_tags: All tags
 ```
 
 Then in order to translate the pages themselves, you have to create one file per locale: `pages/cat1/page.en.md` and `pages/cat1/page.fr.md` if you defined English and French. `pages/cat1/page.md` will be set to the locale defined with `"/"` in `localePaths` in `siteinfo.json`.
