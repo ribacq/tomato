@@ -62,7 +62,7 @@ Locales must first be defined in `siteinfo.json`:
 
 This means that the English version of the website will be at the root: `mysite.com/` and the French version under `mysite.com/fr/`.
 
-Locale files must be defined for the templates, in YAML format. [example/template/locales/](example/template/locales) provides locale files for the example templates in English and French. They look like:
+Locale files must be defined for the templates, in YAML format. [example/templates/locales/](example/templates/locales) provides locale files for the example templates in English and French. They look like:
 
 ```yaml
 en:
