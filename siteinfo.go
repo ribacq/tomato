@@ -14,12 +14,14 @@ import (
 // Copyright will be printed in the footer.
 // Authors must contain all possible authors for the website.
 type Siteinfo struct {
-	Title       string            `json: "title"`
-	Subtitle    string            `json: "subtitle"`
-	Description string            `json: "description"`
-	Copyright   string            `json: "copyright"`
-	Authors     []Author          `json: "authors"`
-	LocalePaths map[string]string `json: "localePaths"`
+	Locales map[string]struct {
+		Path        string `json: "path"`
+		Title       string `json: "title"`
+		Subtitle    string `json: "subtitle"`
+		Description string `json: "description"`
+		Copyright   string `json: "copyright"`
+	} `json: "locales"`
+	Authors []Author `json: "authors"`
 }
 
 // MainAuthorHelper prints a html link to the first author of the siteinfo.
@@ -27,19 +29,24 @@ func (siteinfo Siteinfo) MainAuthorHelper() string {
 	return siteinfo.Authors[0].Helper()
 }
 
-// CopyrightHelper prints html for the copyright information.
-func (siteinfo Siteinfo) CopyrightHelper(page *Page, locale string) string {
-	return string(Html([]byte(siteinfo.Copyright), page, siteinfo.LocalePaths[locale]))
+// Title helper prints html for the site title.
+func (siteinfo Siteinfo) TitleHelper(page *Page, locale string) string {
+	return string(Html([]byte(siteinfo.Locales[locale].Title), page, siteinfo.Locales[locale].Path))
 }
 
 // SubtitleHelper prints html for the site subtitle.
 func (siteinfo Siteinfo) SubtitleHelper(page *Page, locale string) string {
-	return string(Html([]byte(siteinfo.Subtitle), page, siteinfo.LocalePaths[locale]))
+	return string(Html([]byte(siteinfo.Locales[locale].Subtitle), page, siteinfo.Locales[locale].Path))
 }
 
 // DescriptionHelper prints html for the site description.
 func (siteinfo Siteinfo) DescriptionHelper(page *Page, locale string) string {
-	return string(Html([]byte(siteinfo.Description), page, siteinfo.LocalePaths[locale]))
+	return string(Html([]byte(siteinfo.Locales[locale].Description), page, siteinfo.Locales[locale].Path))
+}
+
+// CopyrightHelper prints html for the copyright information.
+func (siteinfo Siteinfo) CopyrightHelper(page *Page, locale string) string {
+	return string(Html([]byte(siteinfo.Locales[locale].Copyright), page, siteinfo.Locales[locale].Path))
 }
 
 // FindAuthor returns an existing author by its name or nil and an error if there is no author with this name.

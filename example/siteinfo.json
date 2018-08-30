@@ -1,24 +1,28 @@
 {
-	"title": "Tomato demo website",
-	"subtitle": "Who doesn’t enjoy a tomato with lettuce?",
-	"description": "This website is a demonstration of the capacities of *tomato*.",
-	"copyright": "This website’s content is under [CC0](https://creativecommons.org/publicdomain/zero/1.0) license.",
-	"localePaths": {
-		"en": "/",
-		"fr": "/fr"
+	"locales": {
+		"en": {
+			"path": "/",
+			"title": "Tomato demo website",
+			"subtitle": "Who doesn’t enjoy a tomato with lettuce?",
+			"description": "This website is a demonstration of the capacities of *tomato*.",
+			"copyright": "This website’s content is under [CC0](https://creativecommons.org/publicdomain/zero/1.0) license."
+		},
+		"fr": {
+			"path": "/fr",
+			"title": "Site démo de Tomato",
+			"subtitle": "Tout le monde aime la tomate et les laitues !",
+			"description": "Ce site est une démonstration des capacités de *tomato*.",
+			"copyright": "Le contenu de ce site est sous license [CC0](https://creativecommons.org/publicdomain/zero/1.0)."
+		}
 	},
 	"authors": [
 		{
 			"name": "Quentin Ribac",
-			"email": "quentin.ribac@gmail.com"
+			"email": "ribac.quentin@gmail.com"
 		},
 		{
 			"name": "Jirsad",
 			"email": "jirsad-ioh@mailoo.org"
-		},
-		{
-			"name": "Johyn Papin",
-			"email": "johynpapin@protonmail.com"
 		}
 	]
 }

@@ -1,18 +1,18 @@
 {{ define "Header" }}
 {{ $page := .Page }}
-{{ $localePath := index .Siteinfo.LocalePaths .Locale }}
+{{ $localePath := (index .Siteinfo.Locales .Locale).Path }}
 {{ $pathToRoot := .Page.PathToRoot $localePath }}
 {{ $pathToLocale := join $pathToRoot $localePath }}
 <!doctype html>
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>{{ .Page.Title }} — {{ .Siteinfo.Title }}</title>
+		<title>{{ .Page.Title }} — {{ .Siteinfo.TitleHelper .Page .Locale }}</title>
 		<link rel="stylesheet" type="text/css" href="{{ join $pathToRoot "/assets/style.css" }}">
 	</head>
 	<body>
 		<header {{ if .Page.PathToFeaturedImage }}style="background-image: url('{{ join $pathToRoot .Page.PathToFeaturedImage }}')"{{ end }}>
-			<h1><a href="{{ join $pathToLocale "index.html" }}" id="top">{{ .Siteinfo.Title }}</a></h1>
+			<h1><a href="{{ join $pathToLocale "index.html" }}" id="top">{{ .Siteinfo.TitleHelper .Page .Locale }}</a></h1>
 			<div id="subtitle">{{ .Siteinfo.SubtitleHelper .Page .Locale }}</div>
 		</header>
 		<nav>
@@ -63,14 +63,14 @@
 				
 				<hr>
 				<h2>{{ t .Locale "full_page.header.about" }}</h2>
-				{{ .Siteinfo.DescriptionHelper .Page $localePath }}
+				{{ .Siteinfo.DescriptionHelper .Page .Locale }}
 				<hr>
 				<h2>{{ t .Locale "full_page.header.languages" }}</h2>
 				<ul>
 				{{ $page := .Page }}
-				{{ range $locale, $localePath := .Siteinfo.LocalePaths }}
+				{{ range $locale, $localeDetails := .Siteinfo.Locales }}
 					{{ with $page.PathInLocale $locale }}
-						<li><a href="{{ join $pathToRoot $localePath . }}"><img src="{{ join $pathToRoot "/media/img" }}/flag_{{ $locale }}.png" alt="flag_{{ $locale }}">&nbsp;{{ t $locale "locale_name" }}</a></li>
+						<li><a href="{{ join $pathToRoot $localeDetails.Path . }}"><img src="{{ join $pathToRoot "/media/img" }}/flag_{{ $locale }}.png" alt="flag_{{ $locale }}">&nbsp;{{ t $locale "locale_name" }}</a></li>
 					{{ end }}
 				{{ end }}
 				</ul>
@@ -78,7 +78,7 @@
 			<section>
 {{ end }}
 {{ define "Footer" }}
-{{ $localePath := index .Siteinfo.LocalePaths .Locale }}
+{{ $localePath := (index .Siteinfo.Locales .Locale).Path }}
 {{ $pathToRoot := .Page.PathToRoot $localePath }}
 			</section>
 		</main>

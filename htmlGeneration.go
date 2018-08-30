@@ -17,8 +17,8 @@ func GenerateIndividualPages(siteinfo Siteinfo, tree *Category, templates *templ
 	for catQueue := []*Category{tree}; len(catQueue) > 0; catQueue = append(catQueue[1:], catQueue[0].SubCategories...) {
 		// create subdirectories
 		for _, subCat := range catQueue[0].SubCategories {
-			if !DirectoryExists(path.Join(outputDir, siteinfo.LocalePaths[locale], subCat.Path())) {
-				err := os.Mkdir(path.Join(outputDir, siteinfo.LocalePaths[locale], subCat.Path()), 0755)
+			if !DirectoryExists(path.Join(outputDir, siteinfo.Locales[locale].Path, subCat.Path())) {
+				err := os.Mkdir(path.Join(outputDir, siteinfo.Locales[locale].Path, subCat.Path()), 0755)
 				if err != nil {
 					return err
 				}
@@ -27,7 +27,7 @@ func GenerateIndividualPages(siteinfo Siteinfo, tree *Category, templates *templ
 
 		// create page files
 		for _, page := range catQueue[0].Pages[locale] {
-			pageFile, err := os.OpenFile(path.Join(outputDir, siteinfo.LocalePaths[locale], page.Path()), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0664)
+			pageFile, err := os.OpenFile(path.Join(outputDir, siteinfo.Locales[locale].Path, page.Path()), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0664)
 			if err != nil {
 				return err
 			}
@@ -42,7 +42,7 @@ func GenerateIndividualPages(siteinfo Siteinfo, tree *Category, templates *templ
 			if err != nil {
 				return err
 			}
-			templates = template.Must(templates.Parse("{{ define \"Content\" }}" + page.ContentHelper(siteinfo.LocalePaths[locale]) + "{{ end }}"))
+			templates = template.Must(templates.Parse("{{ define \"Content\" }}" + page.ContentHelper(siteinfo.Locales[locale].Path) + "{{ end }}"))
 			err = templates.ExecuteTemplate(pageFile, "Content", arg)
 			if err != nil {
 				return err
@@ -76,7 +76,7 @@ func GenerateCategoryPages(siteinfo Siteinfo, tree *Category, templates *templat
 		}
 
 		// create file
-		catFile, err := os.OpenFile(path.Join(outputDir, siteinfo.LocalePaths[locale], catQueue[0].Path(), "index.html"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0664)
+		catFile, err := os.OpenFile(path.Join(outputDir, siteinfo.Locales[locale].Path, catQueue[0].Path(), "index.html"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0664)
 		if err != nil {
 			return err
 		}
@@ -119,7 +119,7 @@ func GenerateCategoryPages(siteinfo Siteinfo, tree *Category, templates *templat
 // GenerateTagPages create a ‘tag’ directory and tag pages in it.
 func GenerateTagPages(siteinfo Siteinfo, tree *Category, templates *template.Template, inputDir, outputDir string, locales *i18n.I18n, locale string) error {
 	// create tag directory
-	tagDir := path.Join(outputDir, siteinfo.LocalePaths[locale], "tag")
+	tagDir := path.Join(outputDir, siteinfo.Locales[locale].Path, "tag")
 	if !DirectoryExists(tagDir) {
 		err := os.Mkdir(tagDir, 0755)
 		if err != nil {

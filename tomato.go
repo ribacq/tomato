@@ -98,16 +98,16 @@ func main() {
 		os.Exit(1)
 	}
 	// create directories from .LocalePaths
-	for _, localePath := range siteinfo.LocalePaths {
-		if !DirectoryExists(path.Join(outputDir, localePath)) {
-			err := os.Mkdir(path.Join(outputDir, localePath), 0775)
+	for locale := range siteinfo.Locales {
+		if !DirectoryExists(path.Join(outputDir, siteinfo.Locales[locale].Path)) {
+			err := os.Mkdir(path.Join(outputDir, siteinfo.Locales[locale].Path), 0775)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
 			}
 		}
 	}
-	fmt.Printf("Done, %v locales, %v authors found.\n", len(siteinfo.LocalePaths), len(siteinfo.Authors))
+	fmt.Printf("Done, %v locales, %v authors found.\n", len(siteinfo.Locales), len(siteinfo.Authors))
 
 	// initialize empty tree
 	tree := NewCategory(siteinfo)
@@ -162,8 +162,8 @@ func main() {
 		if strings.HasSuffix(path.Base(fpath), ".md") {
 			// detect locale, fallback to root locale defined in siteinfo.json
 			var locale string
-			for localeCandidate := range siteinfo.LocalePaths {
-				if siteinfo.LocalePaths[localeCandidate] == "/" {
+			for localeCandidate := range siteinfo.Locales {
+				if siteinfo.Locales[localeCandidate].Path == "/" {
 					locale = localeCandidate
 				}
 				if strings.HasSuffix(path.Base(fpath), "."+localeCandidate+".md") {
@@ -257,7 +257,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	for locale := range siteinfo.LocalePaths {
+	for locale := range siteinfo.Locales {
 		fmt.Printf("%v: %v pages found\n", locale, tree.PageCount(locale))
 	}
 
@@ -281,8 +281,8 @@ func main() {
 	}
 
 	// for each locale
-	for locale := range siteinfo.LocalePaths {
-		fmt.Println("\n\x1b[1mLocale: " + locale + ", in " + siteinfo.LocalePaths[locale] + "\x1b[0m")
+	for locale := range siteinfo.Locales {
+		fmt.Println("\n\x1b[1mLocale: " + locale + ", in " + siteinfo.Locales[locale].Path + "\x1b[0m")
 		// generate individual html pages
 		fmt.Println("Generating html files for individual pages...")
 		if err = GenerateIndividualPages(siteinfo, tree, templates, inputDir, outputDir, locales, locale); err != nil {

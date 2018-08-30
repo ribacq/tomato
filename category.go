@@ -30,7 +30,7 @@ type Category struct {
 func NewCategory(siteinfo Siteinfo) *Category {
 	cat := &Category{}
 	cat.Pages = make(map[string][]*Page)
-	for locale := range siteinfo.LocalePaths {
+	for locale := range siteinfo.Locales {
 		cat.Pages[locale] = make([]*Page, 0)
 	}
 	return cat
