@@ -8,7 +8,7 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Tag: blog — Tomato demo website</title>
-		<link rel="stylesheet" type="text/css" href="./../assets/style.css">
+		<link rel="stylesheet" type="text/css" href="../assets/style.css">
 	</head>
 	<body>
 		<header >
@@ -18,7 +18,7 @@
 		</header>
 		<nav>
 			<div class="flowing-menu"><ul>
-<li><a href="//index.html">Home &gt;</a>
+<li><a href="./../index.html">Home &gt;</a>
 
 <ul>
 <li><a href="./../art/index.html">Art &gt;</a>
@@ -124,6 +124,8 @@
 				
 				
 					
+						<li><a href="../tag/blog.html"><img src="../media/img/flag_en.png" alt="flag_en">&nbsp;English</a></li>
+					
 				
 					
 				
@@ -141,19 +143,19 @@
 			
 				
 					<div class="card">
-						<h2 class="card-title" ><a href="./..//index.html">Hello, world!</a></h2>
+						<h2 class="card-title" ><a href="../index.html">Hello, world!</a></h2>
 						<div class="card-content">
 							<p>
 								This is a statically generated website using Tomato, a piece of software I wrote in Go. If you need help with the syntax, there is help.  
 								<br>
-								<a href="./..//index.html">Read more…</a>
+								<a href="../index.html">Read more…</a>
 							</p>
 							<a href="./../index.html">Home</a>
 							<br>
 							2018-06-02
 							<ul class="tags">
 							
-								<li><a href="./..//tag/blog.html">blog</a></li>
+								<li><a href="../tag/{{ . }}.html">blog</a></li>
 							
 							</ul>
 							<address><a href="mailto:quentin.ribac@gmail.com">Quentin Ribac</a></address><address><a href="mailto:jirsad-ioh@mailoo.org">Jirsad</a></address>
@@ -163,21 +165,21 @@
 			
 				
 					<div class="card">
-						<h2 class="card-title" ><a href="./..//about.html">About</a></h2>
+						<h2 class="card-title" ><a href="../about.html">About</a></h2>
 						<div class="card-content">
 							<p>
 								This page is about this blog. It describes its authors and stuff. The authors are: 
 	
  
 								<br>
-								<a href="./..//about.html">Read more…</a>
+								<a href="../about.html">Read more…</a>
 							</p>
 							<a href="./../index.html">Home</a> &gt; <a href="./../about.html">About</a>
 							<br>
 							2018-05-20
 							<ul class="tags">
 							
-								<li><a href="./..//tag/blog.html">blog</a></li>
+								<li><a href="../tag/{{ . }}.html">blog</a></li>
 							
 							</ul>
 							<address><a href="mailto:quentin.ribac@gmail.com">Quentin Ribac</a></address>
@@ -187,22 +189,22 @@
 			
 				
 					<div class="card">
-						<h2 class="card-title" style="background-image: url('./../media/img/cat.jpg')"><a href="./..//markdown.html">Markdown</a></h2>
+						<h2 class="card-title" style="background-image: url('../media/img/cat.jpg')"><a href="../markdown.html">Markdown</a></h2>
 						<div class="card-content">
 							<p>
 								Markdown is a simple syntax that allows to do many things: emphasis, strong emphasis, links, footnotes. Images: a magnificient cat Note that this image is featured in the header of the page, due to the double exclamation mark. Inline code. !![featured image](cat.jpg)
 ![non featur…
 								<br>
-								<a href="./..//markdown.html">Read more…</a>
+								<a href="../markdown.html">Read more…</a>
 							</p>
 							<a href="./../index.html">Home</a> &gt; <a href="./../markdown.html">Markdown</a>
 							<br>
 							2018-05-19
 							<ul class="tags">
 							
-								<li><a href="./..//tag/help.html">help</a></li>
+								<li><a href="../tag/{{ . }}.html">help</a></li>
 							
-								<li><a href="./..//tag/blog.html">blog</a></li>
+								<li><a href="../tag/{{ . }}.html">blog</a></li>
 							
 							</ul>
 							<address><a href="mailto:quentin.ribac@gmail.com">Quentin Ribac</a></address>
@@ -236,6 +238,6 @@
 			</p>
 		</footer>
 		<!-- load JS -->
-		<script type="text/javascript" src="./../assets/main.js"><p>Sorry, you do not seem to have enabled JavaScript.</p></script>
+		<script type="text/javascript" src="../assets/main.js"><p>Sorry, you do not seem to have enabled JavaScript.</p></script>
 	</body>
 </html>

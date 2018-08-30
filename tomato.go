@@ -160,7 +160,7 @@ func main() {
 	fmt.Println("\n\x1b[1mLoading pages...\x1b[0m")
 	err = WalkDir(inputDir, func(fpath string) error {
 		if strings.HasSuffix(path.Base(fpath), ".md") {
-			// detect locale, fallback to roott locale defined in siteinfo.json
+			// detect locale, fallback to root locale defined in siteinfo.json
 			var locale string
 			for localeCandidate := range siteinfo.LocalePaths {
 				if siteinfo.LocalePaths[localeCandidate] == "/" {
@@ -173,6 +173,14 @@ func main() {
 			}
 			if locale == "" {
 				return fmt.Errorf("Unable to detect locale for %v", fpath)
+			}
+
+			basename := strings.TrimSuffix(strings.TrimSuffix(path.Base(fpath), ".md"), "."+locale)
+			basenameParts := strings.Split(basename, ".")
+			id := basename
+			if len(basenameParts) > 1 {
+				id = basenameParts[0]
+				basename = strings.TrimPrefix(basename, id+".")
 			}
 
 			// load file content
@@ -222,7 +230,7 @@ func main() {
 				}
 				authors = append(authors, author)
 			}
-			page := &Page{nil, strings.TrimSuffix(strings.TrimSuffix(path.Base(fpath), ".md"), "."+locale), title, authors, date, tags, draft, content, pathToFeaturedImage, locale}
+			page := &Page{id, nil, basename, title, authors, date, tags, draft, content, pathToFeaturedImage, locale}
 
 			if page.Draft {
 				fmt.Printf("Skipping draft: ‘%s’\n", page.Title)

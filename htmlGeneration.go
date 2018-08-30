@@ -91,6 +91,7 @@ func GenerateCategoryPages(siteinfo Siteinfo, tree *Category, templates *templat
 				Title:    string(locales.T(locale, "categories.page_list_name", catQueue[0].Name)),
 				Authors:  []*Author{&siteinfo.Authors[0]},
 				Tags:     catQueue[0].Tags(locale),
+				Locale:   locale,
 			},
 			"Tree": tree,
 		}
@@ -148,6 +149,7 @@ func GenerateTagPages(siteinfo Siteinfo, tree *Category, templates *template.Tem
 				Title:    "Tag: " + tag,
 				Authors:  []*Author{&siteinfo.Authors[0]},
 				Tags:     []string{tag},
+				Locale:   locale,
 			},
 			"Tree": tree,
 		}

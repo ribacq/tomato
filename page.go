@@ -15,6 +15,7 @@ import (
 // Basename is the bit that goes in the URL.
 // PathToFeaturedImage should be a URL to an image that will serve as header for this page.
 type Page struct {
+	ID                  string
 	Category            *Category
 	Basename            string
 	Title               string
@@ -68,28 +69,30 @@ func (page *Page) Path() string {
 	return page.Category.Path() + page.Basename + ".html"
 }
 
-// Exists in locale
-func (page *Page) ExistsInLocale(locale string) bool {
-	// if locale doesn’t exist, return false
-	if _, ok := page.Category.Pages[locale]; !ok {
-		return false
+// PathInLocale returns the path to the version of the page in a different locale, without the localePath.
+func (page *Page) PathInLocale(locale string) string {
+	// return self path if locale doesn’t change or basename is index
+	if locale == page.Locale || page.Basename == "index" {
+		return page.Path()
 	}
 
-	// category pages exist in all existing locales
-	if page.Basename == "index" {
-		return true
+	// if locale doesn’t exist, return nil
+	if _, ok := page.Category.Pages[locale]; !ok {
+		return ""
 	}
 
 	// look for page in other locales
 	for _, curPage := range page.Category.Pages[locale] {
-		if curPage.Basename == page.Basename {
-			return true
+		if curPage.ID == page.ID {
+			return curPage.Path()
 		}
 	}
-	return false
+
+	// nothing found
+	return ""
 }
 
-// PathToRoot returns a series of '../' in a string to give a relative path from this page to the root of the website.
+// PathToRoot returns a series of '..' in a string to give a relative path from this page to the root of the website.
 func (page *Page) PathToRoot(localePath string) string {
 	str := "."
 	for i := 0; i < len(strings.Split(path.Join(localePath, page.Path()), "/"))-2; i++ {

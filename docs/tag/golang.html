@@ -8,7 +8,7 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Tag: golang — Tomato demo website</title>
-		<link rel="stylesheet" type="text/css" href="./../assets/style.css">
+		<link rel="stylesheet" type="text/css" href="../assets/style.css">
 	</head>
 	<body>
 		<header >
@@ -18,7 +18,7 @@
 		</header>
 		<nav>
 			<div class="flowing-menu"><ul>
-<li><a href="//index.html">Home &gt;</a>
+<li><a href="./../index.html">Home &gt;</a>
 
 <ul>
 <li><a href="./../art/index.html">Art &gt;</a>
@@ -124,6 +124,8 @@
 				
 				
 					
+						<li><a href="../tag/golang.html"><img src="../media/img/flag_en.png" alt="flag_en">&nbsp;English</a></li>
+					
 				
 					
 				
@@ -141,21 +143,21 @@
 			
 				
 					<div class="card">
-						<h2 class="card-title" style="background-image: url('./../media/img/tomatoes.jpg')"><a href="./..//projects/tomato.html">Tomato</a></h2>
+						<h2 class="card-title" style="background-image: url('../media/img/tomatoes.jpg')"><a href="../projects/tomato.html">Tomato</a></h2>
 						<div class="card-content">
 							<p>
 								This is my super cool website generator! tomatoes 
 								<br>
-								<a href="./..//projects/tomato.html">Read more…</a>
+								<a href="../projects/tomato.html">Read more…</a>
 							</p>
 							<a href="./../index.html">Home</a> &gt; <a href="./../projects/index.html">Projects</a> &gt; <a href="./../projects/tomato.html">Tomato</a>
 							<br>
 							2018-05-19
 							<ul class="tags">
 							
-								<li><a href="./..//tag/project.html">project</a></li>
+								<li><a href="../tag/{{ . }}.html">project</a></li>
 							
-								<li><a href="./..//tag/golang.html">golang</a></li>
+								<li><a href="../tag/{{ . }}.html">golang</a></li>
 							
 							</ul>
 							<address><a href="mailto:quentin.ribac@gmail.com">Quentin Ribac</a></address>
@@ -189,6 +191,6 @@
 			</p>
 		</footer>
 		<!-- load JS -->
-		<script type="text/javascript" src="./../assets/main.js"><p>Sorry, you do not seem to have enabled JavaScript.</p></script>
+		<script type="text/javascript" src="../assets/main.js"><p>Sorry, you do not seem to have enabled JavaScript.</p></script>
 	</body>
 </html>

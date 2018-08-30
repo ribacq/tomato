@@ -49,7 +49,7 @@
 				{{ $tree := .Tree }}
 				{{ $locale := .Locale }}
 				{{ range (.Tree.Tags .Locale) }}
-					<li><a href="{{ join $pathToLocale "/tag"}}/{{ . }}.html">{{ . }} ({{ len ($tree.FilterByTag . $locale) }})</a></li>
+					<li><a href="{{ join $pathToLocale "/tag" }}/{{ . }}.html">{{ . }} ({{ len ($tree.FilterByTag . $locale) }})</a></li>
 				{{ end }}
 				</ul>
 
@@ -69,8 +69,8 @@
 				<ul>
 				{{ $page := .Page }}
 				{{ range $locale, $localePath := .Siteinfo.LocalePaths }}
-					{{ if $page.ExistsInLocale $locale }}
-						<li><a href="{{ join $pathToRoot $localePath $page.Path }}"><img src="{{ join $pathToRoot "/media/img" }}/flag_{{ $locale }}.png" alt="flag_{{ $locale }}">&nbsp;{{ t $locale "locale_name" }}</a></li>
+					{{ with $page.PathInLocale $locale }}
+						<li><a href="{{ join $pathToRoot $localePath . }}"><img src="{{ join $pathToRoot "/media/img" }}/flag_{{ $locale }}.png" alt="flag_{{ $locale }}">&nbsp;{{ t $locale "locale_name" }}</a></li>
 					{{ end }}
 				{{ end }}
 				</ul>
