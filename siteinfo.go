@@ -31,7 +31,7 @@ func (siteinfo Siteinfo) MainAuthorHelper() string {
 
 // Title helper prints html for the site title.
 func (siteinfo Siteinfo) TitleHelper(page *Page, locale string) string {
-	return string(Html([]byte(siteinfo.Locales[locale].Title), page, siteinfo.Locales[locale].Path))
+	return siteinfo.Locales[locale].Title
 }
 
 // SubtitleHelper prints html for the site subtitle.
