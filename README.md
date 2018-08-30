@@ -62,7 +62,7 @@ Locales must first be defined in `siteinfo.json`:
 
 This means that the English version of the website will be at the root: `mysite.com/` and the French version under `mysite.com/fr/`.
 
-Locale files must be defined for the templates, in YAML format. [example/template/locales/](example/template/locales) provides locale files for the example templates in English and French. They look like:
+Locale files must be defined for the templates, in YAML format. [example/templates/locales/](example/templates/locales) provides locale files for the example templates in English and French. They look like:
 
 ```yaml
 en:
@@ -70,7 +70,7 @@ en:
     full_page:
         header:
             page: Page
-			all_tags: All tags
+            all_tags: All tags
 ```
 
 Then in order to translate the pages themselves, you have to create one file per locale: `pages/cat1/page.en.md` and `pages/cat1/page.fr.md` if you defined English and French. `pages/cat1/page.md` will be set to the locale defined with `"/"` in `localePaths` in `siteinfo.json`.
