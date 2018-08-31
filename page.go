@@ -54,7 +54,7 @@ func NewTagPage(tag string, tree *Category, siteinfo *Siteinfo, locales *i18n.I1
 			Parent:   tree,
 			Basename: "tag",
 			Name:     "Tags",
-			Pages:    map[string][]*Page{locale: tree.FilterByTags([]string{tag}, locale)},
+			Pages:    map[string][]*Page{locale: tree.FilterByTag(tag, locale)},
 		},
 		Basename: tag,
 		Title:    string(locales.T(locale, "tags.page_list_name", tag)),
@@ -114,7 +114,7 @@ func (page *Page) PathInLocale(locale string) string {
 		return page.Path()
 	}
 
-	// if locale doesn’t exist, return nil
+	// if locale doesn’t exist, return empty string
 	if _, ok := page.Category.Pages[locale]; !ok {
 		return ""
 	}

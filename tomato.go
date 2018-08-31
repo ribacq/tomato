@@ -304,7 +304,6 @@ func main() {
 		// make tag pages
 		for _, tag := range tree.Tags(locale) {
 			tagPage := NewTagPage(tag, tree, &siteinfo, locales, locale)
-			tagCat, err := tree.TagCategory()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
