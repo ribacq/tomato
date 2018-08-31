@@ -25,7 +25,9 @@
 					{{ end }}
 				{{ end }}
 				{{ range .Tree.SubCategories }}
-					<li><a {{ if eq $page.Category.Path .Path }}class="active"{{ end }} href="{{ join $pathToLocale .Path "index.html" }}">{{ .Name }}</a></li>
+					{{ if ne .Basename "tag" }}
+						<li><a {{ if eq $page.Category.Path .Path }}class="active"{{ end }} href="{{ join $pathToLocale .Path "index.html" }}">{{ .Name }}</a></li>
+					{{ end }}
 				{{ end }}
 			</ul>
 		</nav>

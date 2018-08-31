@@ -9,6 +9,8 @@ import (
 	"path"
 	"regexp"
 	"strings"
+
+	"github.com/qor/i18n"
 )
 
 // Page is the representation of a single page.
@@ -22,10 +24,46 @@ type Page struct {
 	Authors             []*Author
 	Date                string
 	Tags                []string
-	Draft               bool
+	Draft               bool // page won’t exist at all
+	Unlisted            bool // page will exist but will not appear in Recent Pages, tags or category pages
 	Content             []byte
 	PathToFeaturedImage string
 	Locale              string
+}
+
+// NewCategoryPage creates an index page for a category.
+func NewCategoryPage(cat *Category, siteinfo *Siteinfo, locales *i18n.I18n, locale string) *Page {
+	return &Page{
+		ID:       "index",
+		Category: cat,
+		Basename: "index",
+		Title:    string(locales.T(locale, "categories.page_list_name", cat.Name)),
+		Authors:  []*Author{&siteinfo.Authors[0]},
+		Tags:     cat.Tags(locale),
+		Unlisted: true,
+		Content:  []byte("{{ template \"PageList\" . }}"),
+		Locale:   locale,
+	}
+}
+
+// NewTagPage creates a page for a tag.
+func NewTagPage(tag string, tree *Category, siteinfo *Siteinfo, locales *i18n.I18n, locale string) *Page {
+	return &Page{
+		ID: tag,
+		Category: &Category{
+			Parent:   tree,
+			Basename: "tag",
+			Name:     "Tags",
+			Pages:    map[string][]*Page{locale: tree.FilterByTags([]string{tag}, locale)},
+		},
+		Basename: tag,
+		Title:    string(locales.T(locale, "tags.page_list_name", tag)),
+		Authors:  []*Author{&siteinfo.Authors[0]},
+		Tags:     []string{tag},
+		Unlisted: true,
+		Content:  []byte("{{ template \"PageList\" . }}"),
+		Locale:   locale,
+	}
 }
 
 // ContentHelper prints the page in html.

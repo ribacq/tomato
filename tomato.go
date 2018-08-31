@@ -109,8 +109,16 @@ func main() {
 	}
 	fmt.Printf("Done, %v locales, %v authors found.\n", len(siteinfo.Locales), len(siteinfo.Authors))
 
+	// load template locales
+	locales := LoadLocales(inputDir + "/templates/locales")
+
 	// initialize empty tree
 	tree := NewCategory(siteinfo)
+	tagCat := NewCategory(siteinfo)
+	tagCat.Parent = tree
+	tree.SubCategories = append(tree.SubCategories, tagCat)
+	tagCat.Basename = "tag"
+	tagCat.Unlisted = true
 
 	// read category files (all catinfo.json)
 	fmt.Println("\n\x1b[1mLoading categories...\x1b[0m")
@@ -230,7 +238,18 @@ func main() {
 				}
 				authors = append(authors, author)
 			}
-			page := &Page{id, nil, basename, title, authors, date, tags, draft, content, pathToFeaturedImage, locale}
+			page := &Page{
+				ID:                  id,
+				Basename:            basename,
+				Title:               title,
+				Authors:             authors,
+				Date:                date,
+				Tags:                tags,
+				Draft:               draft,
+				Content:             content,
+				PathToFeaturedImage: pathToFeaturedImage,
+				Locale:              locale,
+			}
 
 			if page.Draft {
 				fmt.Printf("Skipping draft: ‘%s’\n", page.Title)
@@ -261,8 +280,38 @@ func main() {
 		fmt.Printf("%v: %v pages found\n", locale, tree.PageCount(locale))
 	}
 
-	// load locales
-	locales := LoadLocales(inputDir + "/templates/locales")
+	// for each locale
+	for locale := range siteinfo.Locales {
+		// make index pages for categories lacking them
+		for catQueue := []*Category{tree}; len(catQueue) > 0; catQueue = append(catQueue[1:], catQueue[0].SubCategories...) {
+			// if there is already an index.md: do nothing
+			mustContinue := false
+			for _, page := range catQueue[0].Pages[locale] {
+				if page.Basename == "index" {
+					mustContinue = true
+					break
+				}
+			}
+			if mustContinue {
+				continue
+			}
+
+			// create category page
+			catPage := NewCategoryPage(catQueue[0], &siteinfo, locales, locale)
+			catQueue[0].Pages[locale] = append(catQueue[0].Pages[locale], catPage)
+		}
+
+		// make tag pages
+		for _, tag := range tree.Tags(locale) {
+			tagPage := NewTagPage(tag, tree, &siteinfo, locales, locale)
+			tagCat, err := tree.TagCategory()
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				os.Exit(1)
+			}
+			tagCat.Pages[locale] = append(tagCat.Pages[locale], tagPage)
+		}
+	}
 
 	// load templates
 	templates := template.New("tomatoTemplates")
@@ -280,29 +329,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	// for each locale
+	// generate the html pages for all locales
 	for locale := range siteinfo.Locales {
 		fmt.Println("\n\x1b[1mLocale: " + locale + ", in " + siteinfo.Locales[locale].Path + "\x1b[0m")
-		// generate individual html pages
-		fmt.Println("Generating html files for individual pages...")
-		if err = GenerateIndividualPages(siteinfo, tree, templates, inputDir, outputDir, locales, locale); err != nil {
+		n, err := GenerateIndividualPages(&siteinfo, tree, templates, inputDir, outputDir, locales, locale)
+		if err != nil {
 			fmt.Fprintln(os.Stderr, "Error:", err)
 			os.Exit(1)
 		}
-
-		// make categories index.html files with catinfo.json if there is no index.html yet
-		fmt.Println("Generating index.html files for categories lacking them...")
-		if err = GenerateCategoryPages(siteinfo, tree, templates, inputDir, outputDir, locales, locale); err != nil {
-			fmt.Fprintln(os.Stderr, "Error:", err)
-			os.Exit(1)
-		}
-
-		// make tags html files
-		fmt.Println("Generating html files for tags...")
-		if err = GenerateTagPages(siteinfo, tree, templates, inputDir, outputDir, locales, locale); err != nil {
-			fmt.Fprintln(os.Stderr, "Error:", err)
-			os.Exit(1)
-		}
+		fmt.Printf("%v html files generated\n", n)
 	}
 
 	fmt.Println("\n\x1b[1mCopying resource directories...\x1b[0m")

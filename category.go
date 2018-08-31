@@ -23,7 +23,8 @@ type Category struct {
 	Name          string             `json: "name"`
 	Description   string             `json: "description"`
 	SubCategories []*Category        `json: "-"`
-	Pages         map[string][]*Page `json: "-"` // Pages: cat.Pages["fr"][0] is the first French page.
+	Pages         map[string][]*Page `json: "-"`        // Pages: cat.Pages["fr"][0] is the first French page.
+	Unlisted      bool               `json: "unlisted"` // category will not appear in flowing menu
 }
 
 // NewCategory returns an empty category with Pages initialized
@@ -36,11 +37,33 @@ func NewCategory(siteinfo Siteinfo) *Category {
 	return cat
 }
 
+// Tree returns the closest parent category whose parent is nil.
+func (cat *Category) Tree() *Category {
+	ret := cat
+	for ret.Parent != nil {
+		ret = ret.Parent
+	}
+	return ret
+}
+
+// TagCategory returns the category with basename "tag" at the root.
+func (cat *Category) TagCategory() (*Category, error) {
+	tree := cat.Tree()
+	for _, subCat := range tree.SubCategories {
+		if subCat.Basename == "tag" {
+			return subCat, nil
+		}
+	}
+	return nil, fmt.Errorf("Unable to find ‘tag’ category at root of tree.")
+}
+
 // mdTree returns the tree of all pages in markdown format
 func (cat *Category) mdTree(prefix string, showPages bool, locale, localePath string) []byte {
 	str := fmt.Sprintf("%s* [%s >](%s)\n", prefix, cat.Name, path.Clean(path.Join(localePath, cat.Path(), "index.html")))
 	for _, subCat := range cat.SubCategories {
-		str += string(subCat.mdTree("\t"+prefix, showPages, locale, localePath))
+		if !subCat.Unlisted {
+			str += string(subCat.mdTree("\t"+prefix, showPages, locale, localePath))
+		}
 	}
 	if showPages {
 		for _, page := range cat.Pages[locale] {
@@ -94,6 +117,9 @@ func (tree *Category) FindParent(fpath string) (*Category, error) {
 // that match at least one of a given set of tags.
 func (cat *Category) FilterByTags(tags []string, locale string) (pages []*Page) {
 	for _, page := range cat.Pages[locale] {
+		if page.Unlisted {
+			continue
+		}
 		for _, pageTag := range page.Tags {
 			for _, testTag := range tags {
 				if pageTag == testTag {
@@ -116,7 +142,12 @@ func (cat *Category) FilterByTag(tag string, locale string) []*Page {
 
 // PageCount returns the total number of pages included in a category and its subcategories.
 func (cat *Category) PageCount(locale string) int {
-	count := len(cat.Pages[locale])
+	count := 0
+	for _, page := range cat.Pages[locale] {
+		if !page.Unlisted {
+			count++
+		}
+	}
 	for _, subCat := range cat.SubCategories {
 		count += subCat.PageCount(locale)
 	}
@@ -165,7 +196,11 @@ func (cat *Category) Tags(locale string) []string {
 // RecentPages returns a list of n pages maximum from the category, most recent first.
 func (cat *Category) RecentPages(n int, locale string) (pages []*Page) {
 	for catQueue := []*Category{cat}; len(catQueue) > 0; catQueue = append(catQueue[1:], catQueue[0].SubCategories...) {
-		pages = append(pages, catQueue[0].Pages[locale]...)
+		for _, page := range catQueue[0].Pages[locale] {
+			if !page.Unlisted {
+				pages = append(pages, page)
+			}
+		}
 	}
 	sort.Slice(pages, func(i, j int) bool {
 		ti, err := time.Parse("2006-01-02", pages[i].Date)
