@@ -263,6 +263,11 @@ func main() {
 				page.Category = parent
 			}
 
+			// special title for site home page
+			if page.Category == tree && page.Basename == "index" {
+				page.Title = siteinfo.Locales[locale].Subtitle
+			}
+
 			// fmt.Println(locale, fpath)
 		}
 		return nil

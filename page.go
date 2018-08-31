@@ -67,11 +67,11 @@ func (page Page) Excerpt() string {
 func (page Page) PathHelper(curPage Page, localePath string) string {
 	var str string
 	if page.Basename != "index" {
-		str = fmt.Sprintf("<a href=\"%s%s\">%s</a>", curPage.PathToRoot(localePath), page.Path(), page.Title)
+		str = fmt.Sprintf("<a href=\"%s\">%s</a>", path.Join(curPage.PathToRoot(localePath), localePath, page.Path()), page.Title)
 	}
 	cat := page.Category
 	for cat != nil {
-		prefix := fmt.Sprintf("<a href=\"%s%sindex.html\">%s</a>", curPage.PathToRoot(localePath), cat.Path(), cat.Name)
+		prefix := fmt.Sprintf("<a href=\"%s\">%s</a>", path.Join(curPage.PathToRoot(localePath), localePath, cat.Path(), "index.html"), cat.Name)
 		if len(str) == 0 {
 			str = prefix
 		} else {
