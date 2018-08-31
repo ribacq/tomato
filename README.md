@@ -102,10 +102,11 @@ Internal links **must** use the locale path prefixes defined in `siteinfo.json`.
 	* Detect locale and ID
 	* Parse meta and content
 	* Add to tree as a Page struct
-* Make html header, menu and footer
+* For each locale:
+	* Create Page structs for categories that lack an index
+	* Create Page structs for all tags
+* Load templates
 * For each locale:
 	* Generate html pages
-	* Generate category pages for those that have no `index.md`
-	* Generate tags html files
 * Copy /media
 * Copy /assets
