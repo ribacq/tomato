@@ -41,7 +41,7 @@ func NewCategoryPage(cat *Category, siteinfo *Siteinfo, locales *i18n.I18n, loca
 		Authors:  []*Author{&siteinfo.Authors[0]},
 		Tags:     cat.Tags(locale),
 		Unlisted: true,
-		Content:  []byte("{{ template \"PageList\" . }}"),
+		Content:  []byte("# {{ .Page.Title }}\n{{ template \"PageList\" . }}"),
 		Locale:   locale,
 	}
 }

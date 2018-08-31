@@ -4,7 +4,6 @@
 {{ $localePath := (index .Siteinfo.Locales .Locale).Path }}
 {{ $pathToRoot := .Page.PathToRoot $localePath }}
 <div class="page-list">
-	<h1>{{ .Page.Title }}</h1>
 	{{ if len $pages }}
 		<div class="cards">
 			{{ range $pages }}
