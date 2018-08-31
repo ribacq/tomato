@@ -15,6 +15,11 @@ import (
 // GenerateIndividualPages creates HTML files and calls the templates for each page defined in the website
 func GenerateIndividualPages(siteinfo *Siteinfo, tree *Category, templates *template.Template, inputDir, outputDir string, locales *i18n.I18n, locale string) (n int, err error) {
 	for catQueue := []*Category{tree}; len(catQueue) > 0; catQueue = append(catQueue[1:], catQueue[0].SubCategories...) {
+		// skip empty category
+		if catQueue[0].IsEmpty(locale) {
+			continue
+		}
+
 		// create subdirectories
 		for _, subCat := range catQueue[0].SubCategories {
 			if !DirectoryExists(path.Join(outputDir, siteinfo.Locales[locale].Path, subCat.Path())) {
@@ -27,6 +32,12 @@ func GenerateIndividualPages(siteinfo *Siteinfo, tree *Category, templates *temp
 
 		// create page files
 		for _, page := range catQueue[0].Pages[locale] {
+			// skip page if its category is not the one it’s accessed by
+			if catQueue[0] != page.Category {
+				continue
+			}
+
+			// create file
 			pageFile, err := os.OpenFile(path.Join(outputDir, siteinfo.Locales[locale].Path, page.Path()), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0664)
 			if err != nil {
 				return n, err

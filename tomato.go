@@ -114,11 +114,6 @@ func main() {
 
 	// initialize empty tree
 	tree := NewCategory(siteinfo)
-	tagCat := NewCategory(siteinfo)
-	tagCat.Parent = tree
-	tree.SubCategories = append(tree.SubCategories, tagCat)
-	tagCat.Basename = "tag"
-	tagCat.Unlisted = true
 
 	// read category files (all catinfo.json)
 	fmt.Println("\n\x1b[1mLoading categories...\x1b[0m")
@@ -280,14 +275,43 @@ func main() {
 		fmt.Printf("%v: %v pages found\n", locale, tree.PageCount(locale))
 	}
 
-	// for each locale
+	// create categories for tags
+	tagCat := NewCategory(siteinfo)
+	tagCat.Parent = tree
+	tree.SubCategories = append(tree.SubCategories, tagCat)
+	tagCat.Basename = "tag"
+	tagCat.Name = "Tags"
+	tagCat.Unlisted = true
 	for locale := range siteinfo.Locales {
-		// make index pages for categories lacking them
+	toNextTag:
+		for _, tag := range tree.Tags(locale) {
+			// skip if it was already created
+			for _, cat := range tagCat.SubCategories {
+				if cat.Basename == tag {
+					continue toNextTag
+				}
+			}
+			cat := &Category{
+				Parent:   tagCat,
+				Basename: tag,
+				Name:     tag,
+				Pages:    map[string][]*Page{},
+				Unlisted: true,
+			}
+			for locale2 := range siteinfo.Locales {
+				cat.Pages[locale2] = tree.FilterByTag(tag, locale2)
+			}
+			tagCat.SubCategories = append(tagCat.SubCategories, cat)
+		}
+	}
+
+	// for each locale, make index pages for categories lacking them
+	for locale := range siteinfo.Locales {
 		for catQueue := []*Category{tree}; len(catQueue) > 0; catQueue = append(catQueue[1:], catQueue[0].SubCategories...) {
 			// if there is already an index.md: do nothing
 			mustContinue := false
 			for _, page := range catQueue[0].Pages[locale] {
-				if page.Basename == "index" {
+				if page.Basename == "index" && page.Category == catQueue[0] {
 					mustContinue = true
 					break
 				}
@@ -296,19 +320,21 @@ func main() {
 				continue
 			}
 
+			// skip empty categories
+			if catQueue[0].IsEmpty(locale) {
+				continue
+			}
+
 			// create category page
 			catPage := NewCategoryPage(catQueue[0], &siteinfo, locales, locale)
-			catQueue[0].Pages[locale] = append(catQueue[0].Pages[locale], catPage)
-		}
 
-		// make tag pages
-		for _, tag := range tree.Tags(locale) {
-			tagPage := NewTagPage(tag, tree, &siteinfo, locales, locale)
-			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				os.Exit(1)
+			// change title for tag pages
+			if catPage.Category.IsUnder(tagCat) {
+				catPage.Title = string(locales.T(locale, "tags.page_list_name", catPage.Category.Name))
 			}
-			tagCat.Pages[locale] = append(tagCat.Pages[locale], tagPage)
+
+			// add the page to its category
+			catQueue[0].Pages[locale] = append(catQueue[0].Pages[locale], catPage)
 		}
 	}
 

@@ -25,7 +25,7 @@ type Page struct {
 	Date                string
 	Tags                []string
 	Draft               bool // page won’t exist at all
-	Unlisted            bool // page will exist but will not appear in Recent Pages, tags or category pages
+	Unlisted            bool // page will exist but will not appear in Recent Pages, tags or category pages, or menus
 	Content             []byte
 	PathToFeaturedImage string
 	Locale              string
@@ -40,26 +40,6 @@ func NewCategoryPage(cat *Category, siteinfo *Siteinfo, locales *i18n.I18n, loca
 		Title:    string(locales.T(locale, "categories.page_list_name", cat.Name)),
 		Authors:  []*Author{&siteinfo.Authors[0]},
 		Tags:     cat.Tags(locale),
-		Unlisted: true,
-		Content:  []byte("{{ template \"PageList\" . }}"),
-		Locale:   locale,
-	}
-}
-
-// NewTagPage creates a page for a tag.
-func NewTagPage(tag string, tree *Category, siteinfo *Siteinfo, locales *i18n.I18n, locale string) *Page {
-	return &Page{
-		ID: tag,
-		Category: &Category{
-			Parent:   tree,
-			Basename: "tag",
-			Name:     "Tags",
-			Pages:    map[string][]*Page{locale: tree.FilterByTag(tag, locale)},
-		},
-		Basename: tag,
-		Title:    string(locales.T(locale, "tags.page_list_name", tag)),
-		Authors:  []*Author{&siteinfo.Authors[0]},
-		Tags:     []string{tag},
 		Unlisted: true,
 		Content:  []byte("{{ template \"PageList\" . }}"),
 		Locale:   locale,
@@ -109,8 +89,8 @@ func (page *Page) Path() string {
 
 // PathInLocale returns the path to the version of the page in a different locale, without the localePath.
 func (page *Page) PathInLocale(locale string) string {
-	// return self path if locale doesn’t change or basename is index
-	if locale == page.Locale || page.Basename == "index" {
+	// return self path if locale doesn’t change
+	if locale == page.Locale {
 		return page.Path()
 	}
 
@@ -121,7 +101,7 @@ func (page *Page) PathInLocale(locale string) string {
 
 	// look for page in other locales
 	for _, curPage := range page.Category.Pages[locale] {
-		if curPage.ID == page.ID {
+		if curPage.ID == page.ID && curPage.Category == page.Category {
 			return curPage.Path()
 		}
 	}

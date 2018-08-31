@@ -4,6 +4,7 @@
 {{ $localePath := (index .Siteinfo.Locales .Locale).Path }}
 {{ $pathToRoot := .Page.PathToRoot $localePath }}
 <div class="page-list">
+	<h1>{{ .Page.Title }}</h1>
 	{{ if len $pages }}
 		<div class="cards">
 			{{ range $pages }}
@@ -21,7 +22,7 @@
 							{{ .Date }}
 							<ul class="tags">
 							{{ range .Tags }}
-								<li><a href="{{ join $pathToRoot $localePath "/tag/{{ . }}.html" }}">{{ . }}</a></li>
+								<li><a href="{{ join $pathToRoot $localePath "tag" . "index.html" }}">{{ . }}</a></li>
 							{{ end }}
 							</ul>
 							{{ range .Authors }}{{ .Helper }}{{ end }}

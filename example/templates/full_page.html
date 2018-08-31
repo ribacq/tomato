@@ -24,8 +24,9 @@
 						<li><a {{ if eq $page.Path .Path }}class="active"{{ end }} href="{{ join $pathToLocale .Path }}">{{ .Title }}</a></li>
 					{{ end }}
 				{{ end }}
+				{{ $locale := .Locale }}
 				{{ range .Tree.SubCategories }}
-					{{ if ne .Basename "tag" }}
+					{{ if and (ne .Basename "tag") (not (.IsEmpty $locale)) }}
 						<li><a {{ if eq $page.Category.Path .Path }}class="active"{{ end }} href="{{ join $pathToLocale .Path "index.html" }}">{{ .Name }}</a></li>
 					{{ end }}
 				{{ end }}
@@ -41,7 +42,7 @@
 				<time>{{ .Page.Date }}</time>
 				<ul class="tags">
 				{{ range .Page.Tags }}
-					<li><a href="{{ join $pathToLocale "/tag" }}/{{ . }}.html">{{ . }}</a></li>
+					<li><a href="{{ join $pathToLocale "tag" . "index.html" }}">{{ . }}</a></li>
 				{{ end }}
 				</ul>
 
@@ -51,7 +52,7 @@
 				{{ $tree := .Tree }}
 				{{ $locale := .Locale }}
 				{{ range (.Tree.Tags .Locale) }}
-					<li><a href="{{ join $pathToLocale "/tag" }}/{{ . }}.html">{{ . }} ({{ len ($tree.FilterByTag . $locale) }})</a></li>
+					<li><a href="{{ join $pathToLocale "tag" . "index.html" }}">{{ . }} ({{ len ($tree.FilterByTag . $locale) }})</a></li>
 				{{ end }}
 				</ul>
 
