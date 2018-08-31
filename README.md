@@ -69,7 +69,7 @@ The first file to change in defining locales is `siteinfo.json`:
 }
 ```
 
-This means that the English version of the website will be at the root: `mysite.com/` and the French version under `mysite.com/fr/`.
+This means that the English version of the website will be at the root: `mysite.com/` and the French version under `mysite.com/fr`.
 
 Locale files must be defined for the **templates**, in YAML format. [example/templates/locales/](example/templates/locales) provides locale files for the example templates in English and French. They look like:
 
@@ -89,7 +89,7 @@ Then in order to translate the pages themselves, you have to create one file per
 * `locale` is the locale code as set in `siteinfo.json`, here `en` or `fr`. If ommited, it will fallback to the locale defined with `/` as its path;
 * `.md` is the obligatory Markdown extension.
 
-In the example input structure above, `foo.english-basename.en.md` and `foo.basename-francais.md` will have links to one another thanks to their id `foo`.
+In the example input structure above, `foo.english-basename.en.md` and `foo.basename-francais.fr.md` will have links to one another thanks to their id `foo`.
 
 Internal links **must** use the locale path prefixes defined in `siteinfo.json`. This means you have to write `[my link](/fr/page.html)` instead of just `[my link](/page.html)` to stay on the French version, if you have defined the French locale path to `/fr`. This is so because links to images and media will still be like `![alt text](/media/img/plop.png)` without locale prefix, whatever the current locale is, and it also allows for cross-language links.
 
