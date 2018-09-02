@@ -12,6 +12,7 @@ fr:
             back_to_top: Retour en haut de page
             no_js: Désolé, vous ne semblez pas avoir activé JavaScript.
     page_list:
+        read_more: Lire la suite…
         empty: Désolé, on dirait qu’il n’y a rien ici.
     categories:
         page_list_name: "Catégorie : {{$1}}"

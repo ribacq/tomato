@@ -12,6 +12,7 @@ en:
             back_to_top: Back to top
             no_js: Sorry, you do not seem to have enabled JavaScript.
     page_list:
+        read_more: Read more…
         empty: There doesn’t seem to be anything here.
     categories:
         page_list_name: "Category: {{$1}}"

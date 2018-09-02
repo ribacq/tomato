@@ -14,7 +14,7 @@
 							<p>
 								{{ .Excerpt }}
 								<br>
-								<a href="{{ join $pathToRoot $localePath .Path }}">Read more…</a>
+								<a href="{{ join $pathToRoot $localePath .Path }}">{{ t .Locale "page_list.read_more" }}</a>
 							</p>
 							{{ .PathHelper $page $localePath }}
 							<br>
