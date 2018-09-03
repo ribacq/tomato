@@ -1,8 +1,10 @@
 {
 	"en": {
+		"basename": "projects",
 		"name": "Projects"
 	},
 	"fr": {
+		"basename": "projets",
 		"name": "Projets"
 	}
 }

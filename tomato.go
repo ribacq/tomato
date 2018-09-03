@@ -132,6 +132,7 @@ func main() {
 			// find path and Basename
 			fpath = path.Dir(strings.TrimPrefix(fpath, inputDir+"/pages"))
 			basename := path.Base(fpath)
+			cat.Realname = basename
 			if fpath == "/" {
 				fpath = ":root:"
 			}
@@ -170,7 +171,7 @@ func main() {
 			}
 
 			// locate parent
-			parent, err := tree.FindParent(fpath, locale)
+			parent, err := tree.FindParent(fpath)
 			if err != nil {
 				return err
 			}
@@ -288,7 +289,7 @@ func main() {
 				return nil
 			}
 
-			parent, err := tree.FindParent(strings.TrimPrefix(fpath, inputDir+"/pages"), locale)
+			parent, err := tree.FindParent(strings.TrimPrefix(fpath, inputDir+"/pages"))
 			if err != nil {
 				return err
 			}

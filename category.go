@@ -19,6 +19,7 @@ import (
 type Category struct {
 	Parent        *Category                      `json: "-"`
 	SubCategories []*Category                    `json: "-"`
+	Realname      string                         `json: "-"`
 	Locales       map[string]*CategoryLocaleData `json: "locales"`
 }
 
@@ -103,7 +104,7 @@ func (cat Category) NavHelper(page *Page, showPages bool, locale, localePath str
 
 // FindParent returns the parent category a given file should go in.
 // A nil error and a nil parent mean the given path is the root.
-func (tree *Category) FindParent(fpath, locale string) (*Category, error) {
+func (tree *Category) FindParent(fpath string) (*Category, error) {
 	if fpath == ":root:" {
 		return nil, nil
 	}
@@ -119,7 +120,7 @@ func (tree *Category) FindParent(fpath, locale string) (*Category, error) {
 	for progress := true; progress && len(pathElems) > 0; {
 		progress = false
 		for _, subCat := range parent.SubCategories {
-			if subCat.Locales[locale].Basename == pathElems[0] {
+			if subCat.Realname == pathElems[0] {
 				parent = subCat
 				pathElems = pathElems[1:]
 				progress = true
