@@ -18,16 +18,16 @@
 		<nav>
 			<div class="flowing-menu">{{ .Tree.NavHelper .Page true .Locale $localePath }}</div>
 			<ul>
-				<li><a {{ if eq .Page.Path "/index.html" }}class="active"{{ end }} href="{{ join $pathToLocale .Tree.Path "index.html" }}">{{ .Tree.Name }}</a></li>
-				{{ range (index .Tree.Pages .Locale) }}
+				<li><a {{ if eq .Page.Path "/index.html" }}class="active"{{ end }} href="{{ join $pathToLocale (.Tree.Path .Locale) "index.html" }}">{{ (index .Tree.Locales .Locale).Name }}</a></li>
+				{{ range (index .Tree.Locales .Locale).Pages }}
 					{{ if ne .Basename "index" }}
 						<li><a {{ if eq $page.Path .Path }}class="active"{{ end }} href="{{ join $pathToLocale .Path }}">{{ .Title }}</a></li>
 					{{ end }}
 				{{ end }}
 				{{ $locale := .Locale }}
 				{{ range .Tree.SubCategories }}
-					{{ if and (ne .Basename "tag") (not (.IsEmpty $locale)) }}
-						<li><a {{ if eq $page.Category.Path .Path }}class="active"{{ end }} href="{{ join $pathToLocale .Path "index.html" }}">{{ .Name }}</a></li>
+					{{ if and (ne (index .Locales $locale).Basename "tag") (not (.IsEmpty $locale)) }}
+						<li><a {{ if eq ($page.Category.Path $locale) (.Path $locale) }}class="active"{{ end }} href="{{ join $pathToLocale (.Path $locale) "index.html" }}">{{ (index .Locales $locale).Name }}</a></li>
 					{{ end }}
 				{{ end }}
 			</ul>
@@ -36,7 +36,7 @@
 			<aside>
 				<h2>{{ t .Locale "full_page.header.page" }}</h2>
 				<p>
-					{{ .Page.PathHelper .Page $localePath }}
+					{{ .Page.PathHelper .Page .Locale $localePath }}
 				</p>
 				{{ range .Page.Authors }}{{ .Helper }}{{ end }}
 				<time>{{ .Page.Date }}</time>

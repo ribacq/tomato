@@ -126,27 +126,62 @@ func main() {
 				return err
 			}
 
-			// load json
+			// create category struct
 			cat := NewCategory(siteinfo)
-			jsonDecoder := json.NewDecoder(f)
-			err = jsonDecoder.Decode(&cat)
-			if err != nil {
-				return err
-			}
+
+			// find path and Basename
 			fpath = path.Dir(strings.TrimPrefix(fpath, inputDir+"/pages"))
-			cat.Basename = path.Base(fpath)
+			basename := path.Base(fpath)
 			if fpath == "/" {
 				fpath = ":root:"
 			}
-			parent, err := tree.FindParent(fpath)
+
+			// json decoder
+			jsonDecoder := json.NewDecoder(f)
+
+			// try json => CategoryLocaleData
+			var locale string
+			for l := range siteinfo.Locales {
+				locale = l
+				break
+			}
+			err = jsonDecoder.Decode(cat.Locales[locale])
+			if err == nil && len(cat.Locales[locale].Name) > 0 {
+				// put this value in all locales
+				for l := range siteinfo.Locales {
+					if l != locale {
+						*cat.Locales[l] = *cat.Locales[locale]
+					}
+				}
+			} else {
+				// try json => Category
+				f.Seek(0, 0)
+				err = jsonDecoder.Decode(&cat.Locales)
+				if err != nil {
+					return err
+				}
+			}
+
+			// set basename where not set yet
+			for locale := range siteinfo.Locales {
+				if cat.Locales[locale].Basename == "" {
+					cat.Locales[locale].Basename = basename
+				}
+			}
+
+			// locate parent
+			parent, err := tree.FindParent(fpath, locale)
 			if err != nil {
 				return err
 			}
+
 			if parent == nil {
-				tree.Name = cat.Name
-				tree.Description = cat.Description
-				tree.Basename = cat.Basename
+				// parent is nil: this is the root category
+				for locale := range siteinfo.Locales {
+					*tree.Locales[locale] = *cat.Locales[locale]
+				}
 			} else {
+				// parent is not nil: insert category
 				parent.SubCategories = append(parent.SubCategories, cat)
 				cat.Parent = parent
 			}
@@ -157,7 +192,9 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	fmt.Printf("%v categories found\n", 1+tree.CategoryCount())
+	for locale := range siteinfo.Locales {
+		fmt.Printf("%v: %v categories found\n", locale, 1+tree.CategoryCount(locale))
+	}
 
 	// read page files (*.md)
 	fmt.Println("\n\x1b[1mLoading pages...\x1b[0m")
@@ -251,15 +288,15 @@ func main() {
 				return nil
 			}
 
-			parent, err := tree.FindParent(strings.TrimPrefix(fpath, inputDir+"/pages"))
+			parent, err := tree.FindParent(strings.TrimPrefix(fpath, inputDir+"/pages"), locale)
 			if err != nil {
 				return err
 			}
 			if parent == nil {
-				tree.Pages[locale] = append(tree.Pages[locale], page)
+				tree.Locales[locale].Pages = append(tree.Locales[locale].Pages, page)
 				page.Category = tree
 			} else {
-				parent.Pages[locale] = append(parent.Pages[locale], page)
+				parent.Locales[locale].Pages = append(parent.Locales[locale].Pages, page)
 				page.Category = parent
 			}
 
@@ -267,8 +304,6 @@ func main() {
 			if page.Category == tree && page.Basename == "index" {
 				page.Title = siteinfo.Locales[locale].Subtitle
 			}
-
-			// fmt.Println(locale, fpath)
 		}
 		return nil
 	})
@@ -284,27 +319,27 @@ func main() {
 	tagCat := NewCategory(siteinfo)
 	tagCat.Parent = tree
 	tree.SubCategories = append(tree.SubCategories, tagCat)
-	tagCat.Basename = "tag"
-	tagCat.Name = "Tags"
-	tagCat.Unlisted = true
+	for locale := range siteinfo.Locales {
+		tagCat.Locales[locale].Basename = "tag"
+		tagCat.Locales[locale].Name = "Tags"
+		tagCat.Locales[locale].Unlisted = true
+	}
 	for locale := range siteinfo.Locales {
 	toNextTag:
 		for _, tag := range tree.Tags(locale) {
 			// skip if it was already created
 			for _, cat := range tagCat.SubCategories {
-				if cat.Basename == tag {
+				if cat.Locales[locale].Basename == tag {
 					continue toNextTag
 				}
 			}
-			cat := &Category{
-				Parent:   tagCat,
-				Basename: tag,
-				Name:     tag,
-				Pages:    map[string][]*Page{},
-				Unlisted: true,
-			}
+			cat := NewCategory(siteinfo)
+			cat.Parent = tagCat
 			for locale2 := range siteinfo.Locales {
-				cat.Pages[locale2] = tree.FilterByTag(tag, locale2)
+				cat.Locales[locale2].Basename = tag
+				cat.Locales[locale2].Name = tag
+				cat.Locales[locale2].Unlisted = true
+				cat.Locales[locale2].Pages = tree.FilterByTag(tag, locale2)
 			}
 			tagCat.SubCategories = append(tagCat.SubCategories, cat)
 		}
@@ -315,7 +350,7 @@ func main() {
 		for catQueue := []*Category{tree}; len(catQueue) > 0; catQueue = append(catQueue[1:], catQueue[0].SubCategories...) {
 			// if there is already an index.md: do nothing
 			mustContinue := false
-			for _, page := range catQueue[0].Pages[locale] {
+			for _, page := range catQueue[0].Locales[locale].Pages {
 				if page.Basename == "index" && page.Category == catQueue[0] {
 					mustContinue = true
 					break
@@ -335,11 +370,11 @@ func main() {
 
 			// change title for tag pages
 			if catPage.Category.IsUnder(tagCat) {
-				catPage.Title = string(locales.T(locale, "tags.page_list_name", catPage.Category.Name))
+				catPage.Title = string(locales.T(locale, "tags.page_list_name", catPage.Category.Locales[locale].Name))
 			}
 
 			// add the page to its category
-			catQueue[0].Pages[locale] = append(catQueue[0].Pages[locale], catPage)
+			catQueue[0].Locales[locale].Pages = append(catQueue[0].Locales[locale].Pages, catPage)
 		}
 	}
 

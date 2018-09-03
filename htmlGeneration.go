@@ -22,8 +22,8 @@ func GenerateIndividualPages(siteinfo *Siteinfo, tree *Category, templates *temp
 
 		// create subdirectories
 		for _, subCat := range catQueue[0].SubCategories {
-			if !DirectoryExists(path.Join(outputDir, siteinfo.Locales[locale].Path, subCat.Path())) {
-				err = os.Mkdir(path.Join(outputDir, siteinfo.Locales[locale].Path, subCat.Path()), 0755)
+			if !DirectoryExists(path.Join(outputDir, siteinfo.Locales[locale].Path, subCat.Path(locale))) {
+				err = os.Mkdir(path.Join(outputDir, siteinfo.Locales[locale].Path, subCat.Path(locale)), 0755)
 				if err != nil {
 					return n, err
 				}
@@ -31,7 +31,7 @@ func GenerateIndividualPages(siteinfo *Siteinfo, tree *Category, templates *temp
 		}
 
 		// create page files
-		for _, page := range catQueue[0].Pages[locale] {
+		for _, page := range catQueue[0].Locales[locale].Pages {
 			// skip page if its category is not the one it’s accessed by
 			if catQueue[0] != page.Category {
 				continue

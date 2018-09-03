@@ -14,25 +14,29 @@ import (
 )
 
 // Category represents a category, that is, a directory in the tree.
-// Name and Description are fetched from a `catinfo.json` file that should
+// Name and Description are fetched from a `catinfo.json` file that should exist in of every directory.
 // Basename is the bit that goes in the URL.
-// be located at the root of every directory.
 type Category struct {
-	Parent        *Category          `json: "-"`
-	Basename      string             `json: "-"`
-	Name          string             `json: "name"`
-	Description   string             `json: "description"`
-	SubCategories []*Category        `json: "-"`
-	Pages         map[string][]*Page `json: "-"`        // Pages: cat.Pages["fr"][0] is the first French page.
-	Unlisted      bool               `json: "unlisted"` // category will not appear in flowing menu
+	Parent        *Category                      `json: "-"`
+	SubCategories []*Category                    `json: "-"`
+	Locales       map[string]*CategoryLocaleData `json: "locales"`
 }
 
-// NewCategory returns an empty category with Pages initialized
+// CategoryLocaleData holds data of a category that changes with the locale
+type CategoryLocaleData struct {
+	Basename    string  `json: "basename"`
+	Name        string  `json: "name"`
+	Description string  `json: "description"`
+	Unlisted    bool    `json: "unlisted"`
+	Pages       []*Page `json: "-"`
+}
+
+// NewCategory returns an empty category with Locales initialized
 func NewCategory(siteinfo Siteinfo) *Category {
 	cat := &Category{}
-	cat.Pages = make(map[string][]*Page)
+	cat.Locales = make(map[string]*CategoryLocaleData)
 	for locale := range siteinfo.Locales {
-		cat.Pages[locale] = make([]*Page, 0)
+		cat.Locales[locale] = &CategoryLocaleData{}
 	}
 	return cat
 }
@@ -50,8 +54,10 @@ func (cat *Category) Tree() *Category {
 func (cat *Category) TagCategory() (*Category, error) {
 	tree := cat.Tree()
 	for _, subCat := range tree.SubCategories {
-		if subCat.Basename == "tag" {
-			return subCat, nil
+		for locale := range subCat.Locales {
+			if subCat.Locales[locale].Basename == "tag" {
+				return subCat, nil
+			}
 		}
 	}
 	return nil, fmt.Errorf("Unable to find ‘tag’ category at root of tree.")
@@ -69,19 +75,19 @@ func (cat *Category) IsUnder(testCat *Category) bool {
 
 // IsEmpty returns whether a category is fully empty in a given locale
 func (cat *Category) IsEmpty(locale string) bool {
-	return len(cat.Pages[locale]) == 0 && len(cat.SubCategories) == 0 && cat.PageCount(locale) == 0
+	return len(cat.Locales[locale].Pages) == 0 && len(cat.SubCategories) == 0 && cat.PageCount(locale) == 0
 }
 
 // mdTree returns the tree of all pages in markdown format
 func (cat *Category) mdTree(prefix string, showPages bool, locale, localePath string) []byte {
-	str := fmt.Sprintf("%s* [%s >](%s)\n", prefix, cat.Name, path.Clean(path.Join(localePath, cat.Path(), "index.html")))
+	str := fmt.Sprintf("%s* [%s >](%s)\n", prefix, cat.Locales[locale].Name, path.Clean(path.Join(localePath, cat.Path(locale), "index.html")))
 	for _, subCat := range cat.SubCategories {
-		if !subCat.Unlisted && !subCat.IsEmpty(locale) {
+		if !subCat.Locales[locale].Unlisted && !subCat.IsEmpty(locale) {
 			str += string(subCat.mdTree("\t"+prefix, showPages, locale, localePath))
 		}
 	}
 	if showPages {
-		for _, page := range cat.Pages[locale] {
+		for _, page := range cat.Locales[locale].Pages {
 			if page.Basename != "index" {
 				str += fmt.Sprintf("%s\t* [%s](%s)\n", prefix, page.Title, path.Clean(path.Join(localePath, page.Path())))
 			}
@@ -97,7 +103,7 @@ func (cat Category) NavHelper(page *Page, showPages bool, locale, localePath str
 
 // FindParent returns the parent category a given file should go in.
 // A nil error and a nil parent mean the given path is the root.
-func (tree *Category) FindParent(fpath string) (*Category, error) {
+func (tree *Category) FindParent(fpath, locale string) (*Category, error) {
 	if fpath == ":root:" {
 		return nil, nil
 	}
@@ -113,7 +119,7 @@ func (tree *Category) FindParent(fpath string) (*Category, error) {
 	for progress := true; progress && len(pathElems) > 0; {
 		progress = false
 		for _, subCat := range parent.SubCategories {
-			if subCat.Basename == pathElems[0] {
+			if subCat.Locales[locale].Basename == pathElems[0] {
 				parent = subCat
 				pathElems = pathElems[1:]
 				progress = true
@@ -131,7 +137,7 @@ func (tree *Category) FindParent(fpath string) (*Category, error) {
 // FilterByTags returns all pages, of a category and its subcategories recursively,
 // that match at least one of a given set of tags.
 func (cat *Category) FilterByTags(tags []string, locale string) (pages []*Page) {
-	for _, page := range cat.Pages[locale] {
+	for _, page := range cat.Locales[locale].Pages {
 		if page.Unlisted || page.Category != cat {
 			continue
 		}
@@ -146,7 +152,7 @@ func (cat *Category) FilterByTags(tags []string, locale string) (pages []*Page) 
 		}
 	}
 	for _, subCat := range cat.SubCategories {
-		if !subCat.Unlisted {
+		if !subCat.Locales[locale].Unlisted {
 			pages = append(pages, subCat.FilterByTags(tags, locale)...)
 		}
 	}
@@ -161,7 +167,7 @@ func (cat *Category) FilterByTag(tag string, locale string) []*Page {
 // PageCount returns the total number of pages included in a category and its subcategories.
 func (cat *Category) PageCount(locale string) int {
 	count := 0
-	for _, page := range cat.Pages[locale] {
+	for _, page := range cat.Locales[locale].Pages {
 		if !page.Unlisted && page.Category == cat {
 			count++
 		}
@@ -173,26 +179,28 @@ func (cat *Category) PageCount(locale string) int {
 }
 
 // CategoryCount returns the total number of subcategories included in a category and its subcategories.
-func (cat *Category) CategoryCount() int {
-	count := len(cat.SubCategories)
+func (cat *Category) CategoryCount(locale string) int {
+	count := 0
 	for _, subCat := range cat.SubCategories {
-		count += subCat.CategoryCount()
+		if !subCat.Locales[locale].Unlisted {
+			count += 1 + subCat.CategoryCount(locale)
+		}
 	}
 	return count
 }
 
 // Path returns a slash-seperated path for the category, starting from the root.
-func (cat *Category) Path() string {
-	if cat == nil || cat.Parent == nil || cat.Basename == "/" {
+func (cat *Category) Path(locale string) string {
+	if cat == nil || cat.Parent == nil || cat.Locales[locale].Basename == "/" {
 		return "/"
 	}
-	return cat.Parent.Path() + cat.Basename + "/"
+	return cat.Parent.Path(locale) + cat.Locales[locale].Basename + "/"
 }
 
 // Tags returns all the tags present in pages in the category and all subcategories.
 func (cat *Category) Tags(locale string) []string {
 	tagsMap := make(map[string]bool)
-	for _, page := range cat.Pages[locale] {
+	for _, page := range cat.Locales[locale].Pages {
 		for _, tag := range page.Tags {
 			tagsMap[tag] = true
 		}
@@ -214,10 +222,10 @@ func (cat *Category) Tags(locale string) []string {
 // RecentPages returns a list of n pages maximum from the category, most recent first.
 func (cat *Category) RecentPages(n int, locale string) (pages []*Page) {
 	for catQueue := []*Category{cat}; len(catQueue) > 0; catQueue = append(catQueue[1:], catQueue[0].SubCategories...) {
-		if !cat.Unlisted && catQueue[0].Unlisted {
+		if !cat.Locales[locale].Unlisted && catQueue[0].Locales[locale].Unlisted {
 			continue
 		}
-		for _, page := range catQueue[0].Pages[locale] {
+		for _, page := range catQueue[0].Locales[locale].Pages {
 			if !page.Unlisted {
 				alreadyThere := false
 				for _, page2 := range pages {

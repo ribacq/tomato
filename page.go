@@ -37,7 +37,7 @@ func NewCategoryPage(cat *Category, siteinfo *Siteinfo, locales *i18n.I18n, loca
 		ID:       "index",
 		Category: cat,
 		Basename: "index",
-		Title:    string(locales.T(locale, "categories.page_list_name", cat.Name)),
+		Title:    string(locales.T(locale, "categories.page_list_name", cat.Locales[locale].Name)),
 		Authors:  []*Author{&siteinfo.Authors[0]},
 		Tags:     cat.Tags(locale),
 		Unlisted: true,
@@ -64,14 +64,14 @@ func (page Page) Excerpt() string {
 }
 
 // PathHelper prints the path from the root to the current page in html.
-func (page Page) PathHelper(curPage Page, localePath string) string {
+func (page Page) PathHelper(curPage Page, locale, localePath string) string {
 	var str string
 	if page.Basename != "index" {
 		str = fmt.Sprintf("<a href=\"%s\">%s</a>", path.Join(curPage.PathToRoot(localePath), localePath, page.Path()), page.Title)
 	}
 	cat := page.Category
 	for cat != nil {
-		prefix := fmt.Sprintf("<a href=\"%s\">%s</a>", path.Join(curPage.PathToRoot(localePath), localePath, cat.Path(), "index.html"), cat.Name)
+		prefix := fmt.Sprintf("<a href=\"%s\">%s</a>", path.Join(curPage.PathToRoot(localePath), localePath, cat.Path(locale), "index.html"), cat.Locales[locale].Name)
 		if len(str) == 0 {
 			str = prefix
 		} else {
@@ -84,7 +84,7 @@ func (page Page) PathHelper(curPage Page, localePath string) string {
 
 // Path returns the slash-seperated path for the page, starting from the root.
 func (page *Page) Path() string {
-	return page.Category.Path() + page.Basename + ".html"
+	return page.Category.Path(page.Locale) + page.Basename + ".html"
 }
 
 // PathInLocale returns the path to the version of the page in a different locale, without the localePath.
@@ -95,12 +95,12 @@ func (page *Page) PathInLocale(locale string) string {
 	}
 
 	// if locale doesn’t exist, return empty string
-	if _, ok := page.Category.Pages[locale]; !ok {
+	if _, ok := page.Category.Locales[locale]; !ok {
 		return ""
 	}
 
 	// look for page in other locales
-	for _, curPage := range page.Category.Pages[locale] {
+	for _, curPage := range page.Category.Locales[locale].Pages {
 		if curPage.ID == page.ID && curPage.Category == page.Category {
 			return curPage.Path()
 		}

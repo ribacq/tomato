@@ -1,3 +1,8 @@
 {
-	"name": "Home"
+	"en": {
+		"name": "Home"
+	},
+	"fr": {
+		"name": "Accueil"
+	}
 }
