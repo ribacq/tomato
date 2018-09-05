@@ -94,9 +94,36 @@ In order for a category to be indexed by tomato, the corresponding directory mus
 
 `unlisted`, if set to `true`, means that the category will exist but hidden in the website, and will not appear in menus. If not specified it is set to `false`.
 
+### Pages
+The content of your site will be written in pages (or articles) which are Markdown files in a category directory. They have to be named something like: `foo.basename.en.md`, where:
+
+* `foo` is an ID linking all versions of your pages in different languages if the basename is different. You can omit this ID if the basename stays the same, as in `index.en.md` and `index.fr.md`;
+* `basename` will appear in the URL, the converted file will be `basename.html`;
+* `en` here stands for the English language, this has to be a locale defined in `siteinfo.json`;
+* `.md` indicates the file is in Markdown, this is compulsory, as only `.md` files are detected by Tomato.
+
+As for the content of the file, it must begin with the following lines:
+
+```markdown
+#!author: Alice, Bob
+#!date: 2018-09-05
+#!tags: cats, memes
+#!draft
+
+# Page title goes here
+Lorem ipsum dolor sit amet...
+```
+
+* `#!author: Alice, Bob` can indicate a comma seperated list of authors, or a single one. The author names have to be exactly those defined in `siteinfo.json;
+* `#!date: 2018-09-05` has to indicate a date in `YYYY-MM-DD` format. It will be the displayed and sorting date of the article and is here so that you can make changes in the file later without them causing the page to go on top of the list on the website’s home page;
+* `#!tags: foo, bar` can contain any strings, comma-seperated;
+* `#!draft` is optional and means that the page will be ignored by Tomato and will not appear in the website at all;
+* Do not forget the space between `#` and the title of the page after the meta-data, otherwise it will not be detected.
+
 ## Internationalization (i18n)
 ### siteinfo.json
 The first file to change in defining locales is `siteinfo.json`:
+
 
 ```json
 {
@@ -146,16 +173,6 @@ en:
             page: Page
             all_tags: All tags
 ```
-
-### Pages
-Then in order to translate the pages themselves, you have to create one file per locale. The filename must respect the format: `[id].[basename](.locale).md` where:
-
-* `id` can be any string. It is never displayed, and is only there to help group the different versions of your pages together;
-* `basename` is what will appear in the final URL: `basename.html`;
-* `locale` is the locale code as set in `siteinfo.json`, here `en` or `fr`. If ommited, it will fallback to the locale defined with `/` as its path;
-* `.md` is the obligatory Markdown extension.
-
-In the example input structure above, `foo.english-basename.en.md` and `foo.basename-francais.fr.md` will have links to one another thanks to their id `foo`.
 
 ### Links
 Internal links **must** use the locale path prefixes defined in `siteinfo.json`. This means you have to write `[my link](/fr/page.html)` instead of just `[my link](/page.html)` to stay on the French version, if you have defined the French locale path to `/fr`. This is so because links to images and media will still be like `![alt text](/media/img/plop.png)` without locale prefix, whatever the current locale is, and it also allows for cross-language links.
