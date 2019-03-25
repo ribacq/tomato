@@ -58,7 +58,7 @@ func GenerateIndividualPages(siteinfo *Siteinfo, tree *Category, templates *temp
 			}
 
 			// content template
-			templates = template.Must(templates.Parse("{{ define \"Content\" }}" + page.ContentHelper(siteinfo.Locales[locale].Path) + "{{ end }}"))
+			templates = template.Must(templates.Parse("{{ define \"Content\" }}{{ $localePath := (index .Siteinfo.Locales .Locale).Path }}" + page.ContentHelper(siteinfo.Locales[locale].Path) + "{{ end }}"))
 			err = templates.ExecuteTemplate(pageFile, "Content", arg)
 			if err != nil {
 				return n, err

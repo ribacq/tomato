@@ -249,7 +249,13 @@ func main() {
 					i--
 				}
 			}
+
 			draft := strings.Trim(strings.TrimPrefix(string(draftRE.Find(content)), "#!"), " \n") == "draft"
+			if draft {
+				fmt.Printf("Skipping draft: ‘%s’\n", fpath)
+				return nil
+			}
+
 			pathToFeaturedImage := ""
 			submatches := featuredImageLinkRE.FindSubmatch(content)
 			if len(submatches) >= 2 {
@@ -267,6 +273,7 @@ func main() {
 			for i := range authorsNames {
 				author, err := siteinfo.FindAuthor(authorsNames[i])
 				if err != nil {
+					println(fpath)
 					return err
 				}
 				authors = append(authors, author)
@@ -284,11 +291,6 @@ func main() {
 				Locale:              locale,
 			}
 
-			if page.Draft {
-				fmt.Printf("Skipping draft: ‘%s’\n", page.Title)
-				return nil
-			}
-
 			parent, err := tree.FindParent(strings.TrimPrefix(fpath, inputDir+"/pages"))
 			if err != nil {
 				return err
@@ -301,10 +303,10 @@ func main() {
 				page.Category = parent
 			}
 
-			// special title for site home page
+			/*/ special title for site home page
 			if page.Category == tree && page.Basename == "index" {
 				page.Title = siteinfo.Locales[locale].Subtitle
-			}
+			}*/
 		}
 		return nil
 	})

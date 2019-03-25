@@ -56,5 +56,5 @@ func (si *Siteinfo) FindAuthor(name string) (*Author, error) {
 			return &si.Authors[i], nil
 		}
 	}
-	return nil, fmt.Errorf("unable to find this author")
+	return nil, fmt.Errorf("unable to find author %q", name)
 }

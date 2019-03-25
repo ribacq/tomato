@@ -52,13 +52,17 @@ func (page *Page) ContentHelper(localePath string) string {
 }
 
 // Excerpt returns an excerpt of the beginning of the page without any html formatting.
-// Its maximum length is 140 characters.
+// Its maximum length is 280 characters.
 func (page Page) Excerpt() string {
 	exc := string(Raw(page.Content))
-	bracesRE := regexp.MustCompile("{{.*}}")
+	bracesRE := regexp.MustCompile("{{ [^{}]* }}")
 	exc = bracesRE.ReplaceAllString(exc, "")
-	if len(exc) > 280 {
-		exc = exc[:280] + "…"
+	cutLen := 140
+	if len(exc) > cutLen {
+		for exc[cutLen-1] != ' ' {
+			cutLen--
+		}
+		exc = exc[:cutLen-1] + "…"
 	}
 	return exc
 }
@@ -80,6 +84,41 @@ func (page Page) PathHelper(curPage Page, locale, localePath string) string {
 		cat = cat.Parent
 	}
 	return str
+}
+
+// PrevNextHelper prints in html links to previous and next page in the given category.
+func (page Page) PrevNextHelper(curPage Page, catPath, locale, localePath string) string {
+	cat, err := curPage.Category.Tree().FindParent(path.Join("/", catPath, "catinfo.json"))
+	if err != nil {
+		return "plop"
+	}
+
+	pages := cat.RecentPages(-1, locale)
+	var prevPage, nextPage *Page
+	for i := range pages {
+		if pages[i].Path() == curPage.Path() {
+			if i > 0 {
+				nextPage = pages[i-1]
+			}
+			if len(pages) > i+1 {
+				prevPage = pages[i+1]
+			}
+			break
+		}
+	}
+
+	var ret string
+	if prevPage != nil {
+		ret = fmt.Sprintf("<a href=\"%s\">&larr;</a>", path.Join(curPage.PathToRoot(localePath), localePath, prevPage.Path()))
+	}
+	if nextPage != nil {
+		if ret != "" {
+			ret += "&nbsp;"
+		}
+		ret += fmt.Sprintf("<a href=\"%s\">&rarr;</a>", path.Join(curPage.PathToRoot(localePath), localePath, nextPage.Path()))
+	}
+
+	return ret
 }
 
 // Path returns the slash-seperated path for the page, starting from the root.
