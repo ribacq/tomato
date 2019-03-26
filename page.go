@@ -57,7 +57,7 @@ func (page Page) Excerpt() string {
 	exc := string(Raw(page.Content))
 	bracesRE := regexp.MustCompile("{{ [^{}]* }}")
 	exc = bracesRE.ReplaceAllString(exc, "")
-	cutLen := 140
+	cutLen := 280
 	if len(exc) > cutLen {
 		for exc[cutLen-1] != ' ' {
 			cutLen--
