@@ -86,39 +86,38 @@ func (page Page) PathHelper(curPage Page, locale, localePath string) string {
 	return str
 }
 
-// PrevNextHelper prints in html links to previous and next page in the given category.
-func (page Page) PrevNextHelper(curPage Page, catPath, locale, localePath string) string {
+// PrevPageURL returns the URL to the previous page in the given category
+func (page Page) PrevPageURL(curPage Page, catPath, locale, localePath string) string {
 	cat, err := curPage.Category.Tree().FindParent(path.Join("/", catPath, "catinfo.json"))
 	if err != nil {
-		return "plop"
+		return ""
 	}
 
 	pages := cat.RecentPages(-1, locale)
-	var prevPage, nextPage *Page
 	for i := range pages {
-		if pages[i].Path() == curPage.Path() {
-			if i > 0 {
-				nextPage = pages[i-1]
-			}
-			if len(pages) > i+1 {
-				prevPage = pages[i+1]
-			}
-			break
+		if pages[i].Path() == curPage.Path() && len(pages) > i+1 {
+			return path.Join(curPage.PathToRoot(localePath), localePath, pages[i+1].Path())
 		}
 	}
 
-	var ret string
-	if prevPage != nil {
-		ret = fmt.Sprintf("<a href=\"%s\">&larr;</a>", path.Join(curPage.PathToRoot(localePath), localePath, prevPage.Path()))
-	}
-	if nextPage != nil {
-		if ret != "" {
-			ret += "&nbsp;"
-		}
-		ret += fmt.Sprintf("<a href=\"%s\">&rarr;</a>", path.Join(curPage.PathToRoot(localePath), localePath, nextPage.Path()))
+	return ""
+}
+
+// NextPageURL returns the URL to the next page in the given category
+func (page Page) NextPageURL(curPage Page, catPath, locale, localePath string) string {
+	cat, err := curPage.Category.Tree().FindParent(path.Join("/", catPath, "catinfo.json"))
+	if err != nil {
+		return ""
 	}
 
-	return ret
+	pages := cat.RecentPages(-1, locale)
+	for i := range pages {
+		if pages[i].Path() == curPage.Path() && i > 0 {
+			return path.Join(curPage.PathToRoot(localePath), localePath, pages[i-1].Path())
+		}
+	}
+
+	return ""
 }
 
 // Path returns the slash-seperated path for the page, starting from the root.

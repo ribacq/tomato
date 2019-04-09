@@ -88,7 +88,7 @@ func (cat *Category) mdTree(prefix string, showPages bool, locale, localePath st
 		}
 	}
 	if showPages {
-		for _, page := range cat.Locales[locale].Pages {
+		for _, page := range SortByRecent(cat.Locales[locale].Pages) {
 			if page.Basename != "index" {
 				str += fmt.Sprintf("%s\t* [%s](%s)\n", prefix, page.Title, path.Clean(path.Join(localePath, page.Path())))
 			}
@@ -241,21 +241,31 @@ func (cat *Category) RecentPages(n int, locale string) (pages []*Page) {
 			}
 		}
 	}
-	sort.Slice(pages, func(i, j int) bool {
-		ti, err := time.Parse("2006-01-02", pages[i].Date)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return false
-		}
-		tj, err := time.Parse("2006-01-02", pages[j].Date)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return true
-		}
-		return ti.After(tj)
-	})
+	pages = SortByRecent(pages)
 	if n >= 0 && len(pages) > n {
 		return pages[:n]
 	}
 	return pages
+}
+
+// SortByRecent returns a copy of the slice sorted by recent first.
+func SortByRecent(pages []*Page) (ret []*Page) {
+	ret = append(ret, pages...)
+	sort.Slice(ret, func(i, j int) bool {
+		if ret[i].Basename == "index" || ret[j].Basename == "index" {
+			return ret[i].Basename != "index"
+		}
+		ti, err := time.Parse("2006-01-02", ret[i].Date)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, ret[i].Path(), err)
+			return false
+		}
+		tj, err := time.Parse("2006-01-02", ret[j].Date)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, ret[i].Path(), err)
+			return true
+		}
+		return ti.After(tj)
+	})
+	return
 }
