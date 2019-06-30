@@ -364,7 +364,7 @@ func main() {
 			}
 
 			// skip empty categories
-			if catQueue[0].PageCount(locale) == 0 {
+			if catQueue[0].PageCount(locale) == 0 && !catQueue[0].IsUnder(tagCat) {
 				continue
 			}
 
