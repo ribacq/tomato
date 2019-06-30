@@ -74,16 +74,11 @@ func (cat *Category) IsUnder(testCat *Category) bool {
 	return false
 }
 
-// IsEmpty returns whether a category is fully empty in a given locale
-func (cat *Category) IsEmpty(locale string) bool {
-	return len(cat.Locales[locale].Pages) == 0 && len(cat.SubCategories) == 0 && cat.PageCount(locale) == 0
-}
-
 // mdTree returns the tree of all pages in markdown format
 func (cat *Category) mdTree(prefix string, showPages bool, locale, localePath string) []byte {
 	str := fmt.Sprintf("%s* [%s >](%s)\n", prefix, cat.Locales[locale].Name, path.Clean(path.Join(localePath, cat.Path(locale), "index.html")))
 	for _, subCat := range cat.SubCategories {
-		if !subCat.Locales[locale].Unlisted && !subCat.IsEmpty(locale) {
+		if !subCat.Locales[locale].Unlisted && subCat.PageCount(locale) > 0 {
 			str += string(subCat.mdTree("\t"+prefix, showPages, locale, localePath))
 		}
 	}
@@ -177,6 +172,11 @@ func (cat *Category) PageCount(locale string) int {
 		count += subCat.PageCount(locale)
 	}
 	return count
+}
+
+// IsEmpty is a shortcut for cat.PageCount(locale) == 0
+func (cat Category) IsEmpty(locale string) bool {
+	return cat.PageCount(locale) == 0
 }
 
 // CategoryCount returns the total number of subcategories included in a category and its subcategories.

@@ -16,7 +16,7 @@ import (
 func GenerateIndividualPages(siteinfo *Siteinfo, tree *Category, templates *template.Template, inputDir, outputDir string, locales *i18n.I18n, locale string) (n int, err error) {
 	for catQueue := []*Category{tree}; len(catQueue) > 0; catQueue = append(catQueue[1:], catQueue[0].SubCategories...) {
 		// skip empty category
-		if catQueue[0].IsEmpty(locale) {
+		if catQueue[0].PageCount(locale) == 0 {
 			continue
 		}
 
