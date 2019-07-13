@@ -21,6 +21,7 @@ type Page struct {
 	Category            *Category
 	Basename            string
 	Title               string
+	ShortSummary        string
 	Authors             []*Author
 	Date                string
 	Tags                []string
@@ -34,15 +35,16 @@ type Page struct {
 // NewCategoryPage creates an index page for a category.
 func NewCategoryPage(cat *Category, siteinfo *Siteinfo, locales *i18n.I18n, locale string) *Page {
 	return &Page{
-		ID:       "index",
-		Category: cat,
-		Basename: "index",
-		Title:    string(locales.T(locale, "categories.page_list_name", cat.Locales[locale].Name)),
-		Authors:  []*Author{&siteinfo.Authors[0]},
-		Tags:     cat.Tags(locale),
-		Unlisted: true,
-		Content:  []byte("# {{ .Page.Title }}\n{{ template \"PageList\" . }}"),
-		Locale:   locale,
+		ID:           "index",
+		Category:     cat,
+		Basename:     "index",
+		Title:        string(locales.T(locale, "categories.page_list_name", cat.Locales[locale].Name)),
+		ShortSummary: string(locales.T(locale, "categories.page_list_name", cat.Locales[locale].Name)),
+		Authors:      []*Author{&siteinfo.Authors[0]},
+		Tags:         cat.Tags(locale),
+		Unlisted:     true,
+		Content:      []byte("# {{ .Page.Title }}\n{{ template \"PageList\" . }}"),
+		Locale:       locale,
 	}
 }
 

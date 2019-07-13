@@ -233,12 +233,14 @@ func main() {
 			// parse meta and remove them from content
 			titleRE := regexp.MustCompile("(?m)^# .+$")
 			authorRE := regexp.MustCompile("(?m)^#!author: (.+)(, .+)*$")
+			shortSummaryRE := regexp.MustCompile("(?m)^#!short-summary: .+$")
 			dateRE := regexp.MustCompile("(?m)^#!date: (\\d{4}-\\d{2}-\\d{2})$")
 			tagsRE := regexp.MustCompile("(?m)^#!tags: .+$")
 			draftRE := regexp.MustCompile("(?m)^#!draft$")
 			featuredImageLinkRE := regexp.MustCompile("!!\\[(.+)\\]\\((.+)\\)")
 
 			title := strings.Trim(strings.TrimPrefix(string(titleRE.Find(content)), "#"), " \n")
+			shortSummary := strings.Trim(strings.TrimPrefix(string(shortSummaryRE.Find(content)), "#!short-summary:"), " \n")
 			authorsNames := strings.Split(strings.Trim(strings.TrimPrefix(string(authorRE.Find(content)), "#!author:"), " \n"), ", ")
 			date := strings.Trim(strings.TrimPrefix(string(dateRE.Find(content)), "#!date:"), " \n")
 			tags := strings.Split(strings.Trim(strings.TrimPrefix(string(tagsRE.Find(content)), "#!tags:"), " \n"), ",")
@@ -263,6 +265,7 @@ func main() {
 			}
 
 			content = authorRE.ReplaceAll(content, []byte{})
+			content = shortSummaryRE.ReplaceAll(content, []byte{})
 			content = dateRE.ReplaceAll(content, []byte{})
 			content = tagsRE.ReplaceAll(content, []byte{})
 			content = draftRE.ReplaceAll(content, []byte{})
@@ -282,6 +285,7 @@ func main() {
 				ID:                  id,
 				Basename:            basename,
 				Title:               title,
+				ShortSummary:        shortSummary,
 				Authors:             authors,
 				Date:                date,
 				Tags:                tags,

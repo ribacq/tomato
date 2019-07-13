@@ -83,7 +83,7 @@ func (cat *Category) mdTree(prefix string, showPages bool, locale, localePath st
 		}
 	}
 	if showPages {
-		for _, page := range SortByRecent(cat.Locales[locale].Pages) {
+		for _, page := range SortPagesByRecent(cat.Locales[locale].Pages) {
 			if page.Basename != "index" {
 				str += fmt.Sprintf("%s\t* [%s](%s)\n", prefix, page.Title, path.Clean(path.Join(localePath, page.Path())))
 			}
@@ -241,15 +241,15 @@ func (cat *Category) RecentPages(n int, locale string) (pages []*Page) {
 			}
 		}
 	}
-	pages = SortByRecent(pages)
+	pages = SortPagesByRecent(pages)
 	if n >= 0 && len(pages) > n {
 		return pages[:n]
 	}
 	return pages
 }
 
-// SortByRecent returns a copy of the slice sorted by recent first.
-func SortByRecent(pages []*Page) (ret []*Page) {
+// SortPagesByRecent returns a copy of the slice sorted by recent first.
+func SortPagesByRecent(pages []*Page) (ret []*Page) {
 	ret = append(ret, pages...)
 	sort.Slice(ret, func(i, j int) bool {
 		if ret[i].Basename == "index" || ret[j].Basename == "index" {
@@ -269,3 +269,5 @@ func SortByRecent(pages []*Page) (ret []*Page) {
 	})
 	return
 }
+
+//
